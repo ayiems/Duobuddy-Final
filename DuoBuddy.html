@@ -1,0 +1,3107 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartCard Connect - DuoBuddy</title>
+  
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --primary: #3b82f6;
+      --secondary: #10b981;
+      --accent: #06b6d4;
+      --muted: #64748b;
+      --surface: #ffffff;
+    }
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      height: 100%;
+    }
+    
+    .gradient-bg { background: linear-gradient(135deg, var(--primary) 0%, #2563eb 50%, var(--accent) 100%); }
+    .bg-animate { background-size: 200% 200%; animation: gradientShift 8s ease infinite; }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    
+    .card {
+      background: var(--surface);
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(2, 6, 23, 0.12);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn {
+      padding: 12px 32px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      font-size: 16px;
+      display: inline-block;
+    }
+    
+    .btn-primary { background: linear-gradient(135deg, #1e3a8a 0%, var(--primary) 100%); color: #fff; box-shadow: 0 8px 20px rgba(59,130,246,.35); }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+    }
+    
+    .btn-secondary { background: #fff; color: #1e3a8a; border: 2px solid #1e3a8a; }
+    
+    .btn-secondary:hover {
+      background: #1e3a8a;
+      color: white;
+    }
+    
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    
+    .input-field {
+      width: 100%;
+      padding: 14px 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .input-field:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    
+    .input-field.success {
+      border-color: #10b981;
+    }
+    
+    .input-field.error {
+      border-color: #ef4444;
+    }
+    
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .page {
+      display: none;
+      min-height: 100%;
+    }
+    
+    .page.active {
+      display: block;
+    }
+    
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      z-index: 99999;
+      animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .profile-avatar {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 60px;
+      font-weight: bold;
+      margin: 0 auto 24px;
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+    }
+    
+    .feature-card {
+      text-align: center;
+      padding: 40px 30px;
+      border-radius: 16px;
+      background: white;
+      transition: all 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-icon { font-size: 60px; margin-bottom: 20px; display: inline-block; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 6px 12px rgba(2,6,23,.25)); }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .card-slot {
+      border: 3px dashed #d1d5db;
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      background: #fafafa;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .card-slot.active {
+      border-color: #10b981;
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      border-style: solid;
+    }
+    
+    .card-slot:hover:not(.locked) {
+      border-color: #3b82f6;
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(59, 130, 246, 0.2);
+      background: white;
+    }
+    
+    .status-badge {
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 700;
+      display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-trial {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+    }
+    
+    .status-active {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+    }
+    
+    .status-expired {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f4f6;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .table th,
+    .table td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .table th {
+      background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+      font-weight: 700;
+      color: #374151;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+    
+    .table tbody tr:hover {
+      background: #f9fafb;
+    }
+    
+    .url-suggestion {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      padding: 10px 16px;
+      border-radius: 20px;
+      margin: 6px;
+      display: inline-block;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+    
+    .url-suggestion:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90%;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .validation-message {
+      font-size: 14px;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+    
+    .validation-message.error {
+      color: #ef4444;
+    }
+    
+    .validation-message.success {
+      color: #10b981;
+    }
+    
+    .validation-message.warning {
+      color: #f59e0b;
+    }
+    
+    .hero-section {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+      padding: 100px 20px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: backgroundScroll 20s linear infinite;
+    }
+    
+    @keyframes backgroundScroll {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+    }
+    
+    .trial-banner {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+    }
+    
+    .expired-banner {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+    }
+    
+    .filter-btn {
+      padding: 10px 20px;
+      border-radius: 25px;
+      background: #f3f4f6;
+      color: #374151;
+      border: 2px solid transparent;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .filter-btn:hover {
+      background: #e5e7eb;
+      transform: translateY(-2px);
+    }
+    
+    .filter-btn.active {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      border-color: #1e3a8a;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 24px 0;
+    }
+    
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .social-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .contact-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    
+    .contact-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .site-footer { background: linear-gradient(135deg, #f9fafb 0%, #eef2ff 100%); border-top: 1px solid #e5e7eb; padding: 24px; }
+    .footer-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-logo { display: inline-flex; align-items: center; gap: 12px; font-weight: 700; color: #1f2937; }
+    .footer-logo-badge { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: 800; }
+    .footer-links { display: inline-flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .footer-links a { color: #1e3a8a; text-decoration: none; font-weight: 600; }
+    .footer-links a:hover { text-decoration: underline; }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body><!-- Homepage -->
+  <div id="homepage" class="page active">
+  <nav class="gradient-bg bg-animate p-4 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+     <h1 class="text-white text-3xl font-bold">✨ SmartCard Connect</h1>
+     <div class="flex gap-4"><a href="#" class="nav-link" onclick="showPage('login'); return false;">Login</a> <a href="#" class="nav-link" onclick="showPage('signup'); return false;">Sign Up</a>
+     </div>
+    </div>
+   </nav>
+   <section class="hero-section bg-animate">
+    <div class="hero-content max-w-5xl mx-auto">
+     <h2 class="text-6xl font-bold mb-6 animate-pulse">Your Smart Digital Business Card</h2>
+     <p class="text-2xl mb-10 opacity-90">Transform networking with NFC-enabled smart cards and personalized profile pages.</p>
+     <div class="flex gap-6 justify-center flex-wrap"><button class="btn btn-primary text-lg px-12 py-4" onclick="showPage('signup')">🚀 Get Started Free</button> <button class="btn btn-secondary text-lg px-12 py-4" onclick="showPage('login')">🔐 Login</button>
+     </div>
+    </div>
+   </section><!-- Card Design Slideshow -->
+   <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+     <h3 class="text-4xl font-bold text-center mb-4 text-gray-800">🎨 Premium Card Designs</h3>
+     <p class="text-center text-gray-600 text-lg mb-12">Choose from our collection of professional NFC business cards</p>
+     <div style="position: relative; max-width: 600px; margin: 0 auto;">
+      <div id="cardSlideshow" style="position: relative; overflow: hidden; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 375px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+       🎴 Premium NFC Business Cards
+      </div><button onclick="changeSlide(-1)" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s;" onmouseover="this.style.background='white'" onmouseout="this.style.background='rgba(255,255,255,0.9)'">❮</button> <button onclick="changeSlide(1)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s;" onmouseover="this.style.background='white'" onmouseout="this.style.background='rgba(255,255,255,0.9)'">❯</button>
+      <div style="text-align: center; margin-top: 20px;">
+       <div id="slideshowDots" style="display: inline-flex; gap: 12px;"><span onclick="currentSlide(0)" style="width: 12px; height: 12px; border-radius: 50%; background: #3b82f6; display: inline-block; cursor: pointer;"></span> <span onclick="currentSlide(1)" style="width: 12px; height: 12px; border-radius: 50%; background: #d1d5db; display: inline-block; cursor: pointer;"></span> <span onclick="currentSlide(2)" style="width: 12px; height: 12px; border-radius: 50%; background: #d1d5db; display: inline-block; cursor: pointer;"></span> <span onclick="currentSlide(3)" style="width: 12px; height: 12px; border-radius: 50%; background: #d1d5db; display: inline-block; cursor: pointer;"></span> <span onclick="currentSlide(4)" style="width: 12px; height: 12px; border-radius: 50%; background: #d1d5db; display: inline-block; cursor: pointer;"></span>
+       </div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+       <h4 id="slideTitle" style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Classic Black</h4>
+       <p id="slideDescription" style="color: #6b7280; font-size: 16px;">Professional matte finish with elegant black design</p>
+      </div>
+     </div>
+    </div>
+   </section>
+   <section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4">
+     <h3 class="text-4xl font-bold text-center mb-16 text-gray-800">Why Choose SmartCard Connect?</h3>
+     <div class="grid md:grid-cols-3 gap-8">
+      <div class="feature-card reveal">
+       <div class="feature-icon">
+        🎴
+       </div>
+       <h4 class="text-2xl font-bold mb-4 text-gray-800">NFC Technology</h4>
+       <p class="text-gray-600 text-lg">Tap and share your contact instantly with cutting-edge NFC cards</p>
+      </div>
+      <div class="feature-card reveal">
+       <div class="feature-icon">
+        🌐
+       </div>
+       <h4 class="text-2xl font-bold mb-4 text-gray-800">Personal Profile Page</h4>
+       <p class="text-gray-600 text-lg">Get your unique URL with a beautiful digital profile</p>
+      </div>
+      <div class="feature-card reveal">
+      <div class="feature-icon">
+        &#9889;&#65039;
+      </div>
+       <h4 class="text-2xl font-bold mb-4 text-gray-800">Instant Updates</h4>
+       <p class="text-gray-600 text-lg">Update your info anytime - no reprinting needed</p>
+      </div>
+     </div>
+    </div>
+   </section><!-- Company Bulk Order Section -->
+   <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+     <div class="text-center mb-16">
+      <div class="text-6xl mb-6">
+       🏢
+      </div>
+      <h3 class="text-5xl font-bold mb-4 text-gray-800">Company Bulk Orders</h3>
+      <p class="text-xl text-gray-600">Equip your entire team with professional NFC business cards</p>
+     </div>
+     <div class="grid lg:grid-cols-2 gap-12 items-center mb-16 reveal">
+      <div class="card p-10">
+        <div class="text-center mb-8"><img alt="DuoBuddy Enterprise Logo" style="display: none; max-width: 200px; margin: 0 auto 20px;">
+        <div style="display: block; width: 200px; height: 100px; margin: 0 auto 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; display: flex;">
+          DuoBuddy
+         </div>
+        <h4 class="text-3xl font-bold text-gray-800 mb-2">DuoBuddy Enterprise</h4>
+        <p class="text-gray-600 mb-1">Registration: 202403241422 (TR0308714-M)</p>
+       </div>
+       <div class="space-y-6">
+        <div class="flex gap-4">
+         <div class="text-3xl">
+          💼
+         </div>
+         <div>
+          <h5 class="font-bold text-xl text-gray-800 mb-2">Unified Design</h5>
+          <p class="text-gray-600">All staff cards feature one consistent design maintaining your brand identity across the organization</p>
+         </div>
+        </div>
+        <div class="flex gap-4">
+         <div class="text-3xl">
+          📊
+         </div>
+         <div>
+          <h5 class="font-bold text-xl text-gray-800 mb-2">Bulk Pricing</h5>
+          <p class="text-gray-600">Special discounted rates for orders of 10+ cards. Perfect for teams, departments, or entire companies</p>
+         </div>
+        </div>
+        <div class="flex gap-4">
+         <div class="text-3xl">
+          ⚙️
+         </div>
+         <div>
+          <h5 class="font-bold text-xl text-gray-800 mb-2">Centralized Management</h5>
+          <p class="text-gray-600">Admin dashboard to manage all employee cards, update information, and track card distribution</p>
+         </div>
+        </div>
+        <div class="flex gap-4">
+         <div class="text-3xl">
+          🎨
+         </div>
+         <div>
+          <h5 class="font-bold text-xl text-gray-800 mb-2">Custom Branding</h5>
+          <p class="text-gray-600">Add your company logo, colors, and branding elements to create professional cards that represent your business</p>
+         </div>
+        </div>
+        <div class="flex gap-4">
+         <div class="text-3xl">
+          🚀
+         </div>
+         <div>
+          <h5 class="font-bold text-xl text-gray-800 mb-2">Fast Deployment</h5>
+          <p class="text-gray-600">Quick turnaround time for bulk orders with coordinated delivery to your office location</p>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div>
+      <div class="card p-10 mb-8 reveal">
+        <h4 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bulk Order Packages</h4>
+        <div class="space-y-6">
+         <div class="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl border-2 border-purple-200">
+          <div class="flex justify-between items-center mb-3">
+           <h5 class="font-bold text-xl text-gray-800">Small Team</h5><span class="status-badge status-trial">10-25 Cards</span>
+          </div>
+          <p class="text-3xl font-bold text-purple-600 mb-2">RM 90 <span class="text-lg text-gray-600">per card</span></p>
+          <p class="text-gray-600">Perfect for startups and small businesses</p>
+         </div>
+         <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border-2 border-green-300">
+          <div class="flex justify-between items-center mb-3">
+           <h5 class="font-bold text-xl text-gray-800">Medium Business</h5><span class="status-badge status-active">26-50 Cards</span>
+          </div>
+          <p class="text-3xl font-bold text-green-600 mb-2">RM 80 <span class="text-lg text-gray-600">per card</span></p>
+          <p class="text-gray-600">Ideal for growing companies</p>
+         </div>
+         <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-2xl border-2 border-yellow-300">
+          <div class="flex justify-between items-center mb-3">
+           <h5 class="font-bold text-xl text-gray-800">Enterprise</h5><span class="status-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">51+ Cards</span>
+          </div>
+          <p class="text-3xl font-bold text-orange-600 mb-2">RM 70 <span class="text-lg text-gray-600">per card</span></p>
+          <p class="text-gray-600">Best value for large organizations</p>
+         </div>
+        </div>
+       </div>
+       <div class="card p-8 bg-gradient-to-br from-purple-600 to-blue-600 text-white text-center">
+        <h5 class="text-2xl font-bold mb-4">Ready to Equip Your Team?</h5>
+        <p class="mb-6 text-lg opacity-90">Contact us for a custom quote and demo</p><button class="btn btn-secondary text-lg px-8 py-4" onclick="showBulkOrderModal()">📞 Request Bulk Order Quote</button>
+       </div>
+      </div>
+     </div>
+     <div class="card p-10 bg-gradient-to-r from-purple-50 to-blue-50">
+      <h4 class="text-3xl font-bold text-center text-gray-800 mb-8">What's Included in Bulk Orders?</h4>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+       <div class="text-center">
+        <div class="text-5xl mb-4">
+         ✅
+        </div>
+        <h5 class="font-bold text-lg text-gray-800 mb-2">One Design Template</h5>
+        <p class="text-gray-600">Consistent branding across all staff cards</p>
+       </div>
+       <div class="text-center">
+        <div class="text-5xl mb-4">
+         👥
+        </div>
+        <h5 class="font-bold text-lg text-gray-800 mb-2">Individual Profiles</h5>
+        <p class="text-gray-600">Each employee gets their own unique URL</p>
+       </div>
+       <div class="text-center">
+        <div class="text-5xl mb-4">
+         🎯
+        </div>
+        <h5 class="font-bold text-lg text-gray-800 mb-2">Admin Dashboard</h5>
+        <p class="text-gray-600">Manage all cards from one central location</p>
+       </div>
+       <div class="text-center">
+        <div class="text-5xl mb-4">
+         🛠️
+        </div>
+        <h5 class="font-bold text-lg text-gray-800 mb-2">Free Setup Support</h5>
+        <p class="text-gray-600">We help configure all your team's cards</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section>
+  </div><!-- Login Page -->
+  <div id="login" class="page">
+   <div class="min-h-full bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+    <div class="card p-10 max-w-md w-full">
+     <div class="text-center mb-8">
+      <div class="text-6xl mb-4">
+       🔐
+      </div>
+      <h2 class="text-4xl font-bold text-gray-800">Welcome Back!</h2>
+      <p class="text-gray-600 mt-2">Login to access your digital cards</p>
+     </div>
+     <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="mb-6"><label for="loginEmail" class="block text-gray-700 mb-2 font-semibold">Email Address</label> <input type="email" id="loginEmail" class="input-field" placeholder="your@email.com" required>
+      </div>
+      <div class="mb-8"><label for="loginPassword" class="block text-gray-700 mb-2 font-semibold">Password</label> <input type="password" id="loginPassword" class="input-field" placeholder="Enter your password" required>
+      </div><button type="submit" class="btn btn-primary w-full mb-6" id="loginBtn"> <span id="loginBtnText">🚀 Login to Dashboard</span> <span id="loginBtnLoading" style="display: none;"><span class="loading"></span></span> </button>
+      <div class="text-center">
+       <p class="text-gray-600">New here? <a href="#" class="text-purple-600 hover:underline font-bold" onclick="showPage('signup'); return false;">Create Free Account</a></p>
+      </div>
+     </form>
+     <div class="mt-8 text-center"><button class="btn btn-secondary" onclick="showPage('homepage')">← Back to Home</button>
+     </div>
+    </div>
+   </div>
+  </div><!-- Sign Up Page -->
+  <div id="signup" class="page">
+   <div class="min-h-full bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+    <div class="card p-10 max-w-lg w-full">
+     <div class="text-center mb-8">
+      <div class="text-6xl mb-4">
+       ✨
+      </div>
+      <h2 class="text-4xl font-bold text-gray-800">Join SmartCard</h2>
+      <p class="text-gray-600 mt-2">Start your 1-day free trial today!</p>
+     </div>
+     <form id="signupForm" onsubmit="handleSignup(event)">
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+       <div><label for="signupName" class="block text-gray-700 mb-2 font-semibold">Full Name</label> <input type="text" id="signupName" class="input-field" placeholder="John Doe" required>
+       </div>
+       <div><label for="signupPhone" class="block text-gray-700 mb-2 font-semibold">Phone Number</label> <input type="tel" id="signupPhone" class="input-field" placeholder="+60 12-345 6789" required>
+       </div>
+      </div>
+      <div class="mb-4"><label for="signupEmail" class="block text-gray-700 mb-2 font-semibold">Email Address</label> <input type="email" id="signupEmail" class="input-field" placeholder="your@email.com" required>
+      </div>
+      <div class="mb-4"><label for="signupUsername" class="block text-gray-700 mb-2 font-semibold">Username (Your URL)</label> <input type="text" id="signupUsername" class="input-field" placeholder="johndoe" required oninput="validateUsername(this.value, 'signup')">
+       <p class="text-sm font-semibold mt-2" style="color: #1e3a8a;">🌐 Your URL: <span id="signupUrlPreview">duobuddy.my/johndoe</span></p>
+       <div id="signupUsernameValidation"></div>
+       <div id="signupUsernameSuggestions"></div>
+      </div>
+      <div class="mb-6"><label for="signupPassword" class="block text-gray-700 mb-2 font-semibold">Password</label> <input type="password" id="signupPassword" class="input-field" placeholder="Create a strong password" required>
+      </div><button type="submit" class="btn btn-primary w-full mb-6" id="signupBtn"> <span id="signupBtnText">🎉 Create Free Account</span> <span id="signupBtnLoading" style="display: none;"><span class="loading"></span></span> </button>
+      <div class="text-center">
+       <p class="text-gray-600">Already a member? <a href="#" class="hover:underline font-bold" style="color: #1e3a8a;" onclick="showPage('login'); return false;">Login Here</a></p>
+      </div>
+     </form>
+     <div class="mt-8 text-center"><button class="btn btn-secondary" onclick="showPage('homepage')">← Back to Home</button>
+     </div>
+    </div>
+   </div>
+  </div><!-- My Cards Dashboard -->
+  <div id="my-cards" class="page">
+   <nav class="gradient-bg p-4 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+     <h1 class="text-white text-3xl font-bold">🎴 My NFC Cards</h1>
+     <div class="flex gap-4"><button class="btn btn-secondary" onclick="showPage('profile')">👤 Profile</button> <button class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+     </div>
+    </div>
+   </nav>
+   <div class="max-w-7xl mx-auto px-4 py-10">
+    <div id="accountStatusBanner"></div>
+    <div class="card p-10">
+     <div class="text-center mb-10">
+      <h2 class="text-4xl font-bold text-gray-800 mb-3">Your Card Collection</h2>
+      <p class="text-gray-600 text-lg">Order up to 10 premium NFC business cards • RM 99 per card</p>
+     </div>
+     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="cardSlotsContainer"><!-- Card slots dynamically generated -->
+     </div>
+    </div>
+   </div>
+  </div><!-- User Profile -->
+  <div id="profile" class="page">
+   <nav class="gradient-bg p-4 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+     <h1 class="text-white text-3xl font-bold">👤 My Profile</h1>
+     <div class="flex gap-4"><button class="btn btn-secondary" onclick="showPage('my-cards')">🎴 My Cards</button> <button class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+     </div>
+    </div>
+   </nav>
+   <div class="max-w-5xl mx-auto px-4 py-10">
+    <div class="card p-10">
+     <div class="text-center mb-10">
+      <div class="profile-avatar" id="profileAvatar">
+       JD
+      </div>
+      <h2 class="text-3xl font-bold text-gray-800 mb-2" id="profileName">John Doe</h2>
+      <p class="text-xl text-gray-600 mb-4" id="profileTitle">Marketing Manager</p>
+      <div class="inline-block p-4 bg-gradient-to-r from-purple-100 to-blue-100 rounded-2xl">
+       <p class="text-sm text-gray-600 mb-1">Your Dedicated URL:</p>
+       <p class="text-2xl font-bold text-purple-600" id="profileURL">duobuddy.my/johndoe</p>
+      </div>
+     </div>
+     <div class="grid md:grid-cols-2 gap-8 mb-10">
+      <div class="bg-gray-50 p-6 rounded-2xl">
+       <h3 class="font-bold text-xl text-gray-800 mb-4">📞 Contact Information</h3>
+       <div class="space-y-3">
+        <p class="text-gray-700"><span class="font-semibold">Email:</span> <span id="profileEmail">john@example.com</span></p>
+        <div>
+         <p class="text-gray-700 mb-2"><span class="font-semibold">Phone:</span> <span id="profilePhone">+60 12-345 6789</span></p>
+         <div class="contact-actions" id="profileContactActions"><!-- Contact buttons will be added here -->
+         </div>
+        </div>
+        <p class="text-gray-700"><span class="font-semibold">Company:</span> <span id="profileCompany">Tech Corp</span></p>
+       </div>
+      </div>
+      <div class="bg-gray-50 p-6 rounded-2xl">
+       <h3 class="font-bold text-xl text-gray-800 mb-4">ℹ️ About Me</h3>
+       <p class="text-gray-700" id="profileAbout">Tell people about yourself...</p>
+      </div>
+     </div>
+     <div id="profileSocialLinks" class="mb-10"><!-- Social links will be added here -->
+     </div>
+     <div class="flex gap-6 justify-center flex-wrap"><button class="btn btn-primary text-lg" onclick="showPage('edit-profile')">✏️ Edit Profile</button> <button class="btn btn-primary text-lg" onclick="openProfilePreview()">🔍 Preview Profile</button> <button class="btn btn-secondary text-lg" onclick="showPage('change-password')">&#128273; Change Password</button>
+     </div>
+    </div>
+   </div>
+  </div><!-- Edit Profile -->
+  <div id="edit-profile" class="page">
+   <nav class="gradient-bg p-4 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+     <h1 class="text-white text-3xl font-bold">✏️ Edit Profile</h1><button class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+    </div>
+   </nav>
+   <div class="max-w-4xl mx-auto px-4 py-10">
+    <div class="card p-10">
+     <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Update Your Information</h2><!-- Profile Picture Upload -->
+     <div class="text-center mb-8">
+      <div class="profile-avatar mb-4" id="editProfileAvatar">
+       JD
+      </div><img id="editProfileImage" style="display: none; width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 24px; object-fit: cover; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);" alt="Profile Picture">
+      <div><label for="profilePictureUpload" class="btn btn-primary cursor-pointer">📷 Upload Profile Picture</label> <input type="file" id="profilePictureUpload" accept="image/*" style="display: none;" onchange="handleProfilePictureUpload(event)"> <button type="button" class="btn btn-secondary ml-4" onclick="removeProfilePicture()" id="removeProfilePicBtn" style="display: none;">🗑️ Remove</button>
+      </div>
+      <p class="text-sm text-gray-500 mt-2">JPG, PNG or GIF (Max 10MB)</p>
+     </div>
+     <form id="editProfileForm" onsubmit="handleUpdateProfile(event)">
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+       <div><label for="editName" class="block text-gray-700 mb-2 font-semibold">Full Name</label> <input type="text" id="editName" class="input-field" required>
+       </div>
+       <div><label for="editUsername" class="block text-gray-700 mb-2 font-semibold">Username</label> <input type="text" id="editUsername" class="input-field" required oninput="validateUsername(this.value, 'edit')">
+        <p class="text-sm text-purple-600 font-semibold mt-2">URL: <span id="editUrlPreview">duobuddy.my/username</span></p>
+        <div id="editUsernameValidation"></div>
+        <div id="editUsernameSuggestions"></div>
+       </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+       <div><label for="editJobTitle" class="block text-gray-700 mb-2 font-semibold">Job Title</label> <input type="text" id="editJobTitle" class="input-field">
+       </div>
+       <div><label for="editCompany" class="block text-gray-700 mb-2 font-semibold">Company</label> <input type="text" id="editCompany" class="input-field">
+       </div>
+      </div>
+      <div class="mb-6"><label for="editPhone" class="block text-gray-700 mb-2 font-semibold">Phone Number</label> <input type="tel" id="editPhone" class="input-field" placeholder="+60 12-345 6789">
+      </div>
+      <div class="mb-6"><label for="editWhatsapp" class="block text-gray-700 mb-2 font-semibold">WhatsApp Number (Optional)</label> <input type="tel" id="editWhatsapp" class="input-field" placeholder="+60 12-345 6789">
+       <p class="text-sm text-gray-500 mt-2">Leave blank to use phone number for WhatsApp</p>
+      </div>
+      <div class="mb-6"><label class="block text-gray-700 mb-3 font-semibold">🌐 Social Media Links (Optional)</label>
+       <div class="grid md:grid-cols-2 gap-4">
+        <div><label for="editFacebook" class="block text-gray-600 mb-1 text-sm">Facebook Username</label> <input type="text" id="editFacebook" class="input-field" placeholder="yourprofile">
+         <p class="text-xs text-gray-500 mt-1">facebook.com/<strong>yourprofile</strong></p>
+        </div>
+        <div><label for="editInstagram" class="block text-gray-600 mb-1 text-sm">Instagram Username</label> <input type="text" id="editInstagram" class="input-field" placeholder="yourprofile">
+         <p class="text-xs text-gray-500 mt-1">instagram.com/<strong>yourprofile</strong></p>
+        </div>
+        <div><label for="editLinkedin" class="block text-gray-600 mb-1 text-sm">LinkedIn Username</label> <input type="text" id="editLinkedin" class="input-field" placeholder="yourprofile">
+         <p class="text-xs text-gray-500 mt-1">linkedin.com/in/<strong>yourprofile</strong></p>
+        </div>
+        <div><label for="editTwitter" class="block text-gray-600 mb-1 text-sm">Twitter / X Username</label> <input type="text" id="editTwitter" class="input-field" placeholder="yourprofile">
+         <p class="text-xs text-gray-500 mt-1">twitter.com/<strong>yourprofile</strong></p>
+        </div>
+        <div><label for="editTiktok" class="block text-gray-600 mb-1 text-sm">TikTok Username</label> <input type="text" id="editTiktok" class="input-field" placeholder="yourprofile">
+         <p class="text-xs text-gray-500 mt-1">tiktok.com/@<strong>yourprofile</strong></p>
+        </div>
+        <div><label for="editYoutube" class="block text-gray-600 mb-1 text-sm">YouTube Channel</label> <input type="text" id="editYoutube" class="input-field" placeholder="yourchannel">
+         <p class="text-xs text-gray-500 mt-1">youtube.com/@<strong>yourchannel</strong></p>
+        </div>
+        <div><label for="editWebsite" class="block text-gray-600 mb-1 text-sm">Website URL</label> <input type="text" id="editWebsite" class="input-field" placeholder="yourwebsite.com">
+         <p class="text-xs text-gray-500 mt-1">Full URL with https://</p>
+        </div>
+        <div><label for="editOther" class="block text-gray-600 mb-1 text-sm">Other Link URL</label> <input type="text" id="editOther" class="input-field" placeholder="Full URL">
+         <p class="text-xs text-gray-500 mt-1">Full URL with https://</p>
+        </div>
+       </div>
+      </div>
+      <div class="mb-8"><label for="editAbout" class="block text-gray-700 mb-2 font-semibold">About Me</label> <textarea id="editAbout" class="input-field" rows="4"></textarea>
+      </div>
+      <div class="flex gap-6 justify-center"><button type="submit" class="btn btn-primary text-lg" id="updateBtn"> <span id="updateBtnText">💾 Save Changes</span> <span id="updateBtnLoading" style="display: none;"><span class="loading"></span></span> </button> <button type="button" class="btn btn-secondary text-lg" onclick="showPage('profile')">Cancel</button>
+      </div>
+     </form>
+    </div>
+   </div>
+  </div><!-- Profile Preview Modal -->
+  <div id="profilePreviewModal" style="display: none;">
+   <div class="modal-overlay" onclick="closeProfilePreview()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+     <div class="p-10">
+      <div class="flex justify-between items-center mb-8">
+       <h3 class="text-4xl font-bold text-gray-800">🔍 Profile Preview</h3><button class="text-4xl text-gray-500 hover:text-gray-800" onclick="closeProfilePreview()">×</button>
+      </div>
+      <div class="text-center mb-10">
+       <div class="profile-avatar mb-4" id="previewProfileAvatar">
+        JD
+       </div><img id="previewProfileImage" style="display: none; width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 24px; object-fit: cover; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);" alt="Profile Picture">
+       <h2 class="text-4xl font-bold text-gray-800 mb-2" id="previewProfileName">Your Name</h2>
+       <p class="text-2xl text-gray-600 mb-4" id="previewProfileTitle">Your Job Title</p>
+       <div class="inline-block p-4 bg-gradient-to-r from-purple-100 to-blue-100 rounded-2xl">
+        <p class="text-sm text-gray-600 mb-1">Your Public URL:</p>
+        <p class="text-2xl font-bold text-purple-600" id="previewProfileURL">duobuddy.my/username</p>
+       </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8 mb-10">
+       <div class="bg-gray-50 p-6 rounded-2xl">
+        <h3 class="font-bold text-xl text-gray-800 mb-4">📞 Contact Information</h3>
+        <div class="space-y-3">
+         <p class="text-gray-700"><span class="font-semibold">Email:</span> <span id="previewProfileEmail">your@email.com</span></p>
+         <div>
+          <p class="text-gray-700 mb-2"><span class="font-semibold">Phone:</span> <span id="previewProfilePhone">+60 12-345 6789</span></p>
+          <div class="contact-actions" id="previewProfileContactActions"><!-- Contact buttons will be added here -->
+          </div>
+         </div>
+         <p class="text-gray-700"><span class="font-semibold">Company:</span> <span id="previewProfileCompany">Your Company</span></p>
+        </div>
+       </div>
+       <div class="bg-gray-50 p-6 rounded-2xl">
+        <h3 class="font-bold text-xl text-gray-800 mb-4">ℹ️ About Me</h3>
+        <p class="text-gray-700" id="previewProfileAbout">Tell people about yourself...</p>
+       </div>
+      </div>
+      <div id="previewProfileSocialLinks" class="mb-10"><!-- Social links will be added here -->
+      </div>
+      <div class="flex gap-4 justify-center"><button class="btn btn-primary text-lg" onclick="openPublicProfileInNewTab()">🌐 Open Full Profile</button> <button class="btn btn-secondary text-lg" onclick="closeProfilePreview()">Close Preview</button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div><!-- Public Profile View Page -->
+  <div id="public-profile" class="page">
+   <nav class="gradient-bg p-4 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+     <h1 class="text-white text-3xl font-bold">✨ SmartCard Connect</h1>
+     <div class="flex gap-4"><a href="#" class="nav-link" onclick="showPage('homepage'); return false;">Home</a>
+     </div>
+    </div>
+   </nav>
+   <div class="min-h-full bg-gradient-to-br from-purple-50 to-blue-50 py-10">
+    <div class="max-w-4xl mx-auto px-4">
+     <div class="card p-10">
+      <div class="text-center mb-10">
+       <div class="profile-avatar mb-4" id="publicProfileAvatar">
+        ?
+       </div><img id="publicProfileImage" style="display: none; width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 24px; object-fit: cover; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);" alt="Profile Picture">
+       <h2 class="text-4xl font-bold text-gray-800 mb-2" id="publicProfileName">Loading...</h2>
+       <p class="text-2xl text-gray-600 mb-4" id="publicProfileTitle"></p>
+      </div>
+      <div id="publicProfileContent">
+       <div class="grid md:grid-cols-2 gap-8 mb-10">
+        <div class="bg-gray-50 p-6 rounded-2xl">
+         <h3 class="font-bold text-xl text-gray-800 mb-4">📞 Contact Information</h3>
+         <div class="space-y-3">
+          <p class="text-gray-700"><span class="font-semibold">Email:</span> <a href="#" id="publicProfileEmail" class="text-purple-600 hover:underline"></a></p>
+          <div>
+           <p class="text-gray-700 mb-2"><span class="font-semibold">Phone:</span> <a href="#" id="publicProfilePhone" class="text-purple-600 hover:underline"></a></p>
+           <div class="contact-actions" id="publicProfileContactActions"><!-- Contact buttons will be added here -->
+           </div>
+          </div>
+          <p class="text-gray-700"><span class="font-semibold">Company:</span> <span id="publicProfileCompany"></span></p>
+         </div>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-2xl">
+         <h3 class="font-bold text-xl text-gray-800 mb-4">ℹ️ About</h3>
+         <p class="text-gray-700" id="publicProfileAbout"></p>
+        </div>
+       </div>
+       <div id="publicProfileSocialLinks" class="mb-10"><!-- Social links will be added here -->
+       </div>
+       <div class="text-center"><a href="#" class="btn btn-primary text-lg" id="saveContactBtn">💾 Save Contact</a>
+       </div>
+      </div>
+      <div id="publicProfileError" style="display: none;" class="text-center py-10">
+       <div class="text-6xl mb-4">
+        ❌
+       </div>
+       <h3 class="text-2xl font-bold text-gray-800 mb-2">Profile Not Found</h3>
+       <p class="text-gray-600 mb-6">This user profile doesn't exist or has been removed.</p><button class="btn btn-primary" onclick="showPage('homepage')">← Back to Home</button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div><!-- Change Password -->
+  <div id="change-password" class="page">
+   <nav class="gradient-bg p-4 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+     <h1 class="text-white text-3xl font-bold">🔒 Change Password</h1><button class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+    </div>
+   </nav>
+   <div class="max-w-2xl mx-auto px-4 py-10">
+    <div class="card p-10">
+     <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Update Your Password</h2>
+     <form id="changePasswordForm" onsubmit="handleChangePassword(event)">
+      <div class="mb-6"><label for="currentPassword" class="block text-gray-700 mb-2 font-semibold">Current Password</label> <input type="password" id="currentPassword" class="input-field" required>
+      </div>
+      <div class="mb-6"><label for="newPassword" class="block text-gray-700 mb-2 font-semibold">New Password</label> <input type="password" id="newPassword" class="input-field" required minlength="6">
+       <p class="text-sm text-gray-500 mt-2">Minimum 6 characters</p>
+      </div>
+      <div class="mb-8"><label for="confirmPassword" class="block text-gray-700 mb-2 font-semibold">Confirm New Password</label> <input type="password" id="confirmPassword" class="input-field" required>
+      </div>
+      <div class="flex gap-6 justify-center"><button type="submit" class="btn btn-primary text-lg" id="changePasswordBtn"> <span id="changePasswordBtnText">🔐 Update Password</span> <span id="changePasswordBtnLoading" style="display: none;"><span class="loading"></span></span> </button> <button type="button" class="btn btn-secondary text-lg" onclick="showPage('profile')">Cancel</button>
+      </div>
+     </form>
+    </div>
+   </div>
+  </div><!-- Admin Dashboard -->
+  <div id="admin" class="page">
+   <nav class="gradient-bg p-4 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+     <h1 class="text-white text-3xl font-bold">⚙️ Admin Dashboard</h1>
+     <div class="flex gap-4"><button class="btn btn-secondary" onclick="showPage('change-password')">🔒 Change Password</button> <button class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+     </div>
+    </div>
+   </nav>
+   <div class="max-w-7xl mx-auto px-4 py-10"><!-- Stats Dashboard -->
+    <div class="grid md:grid-cols-4 gap-6 mb-10">
+     <div class="stat-card">
+      <div class="text-5xl mb-3">
+       👥
+      </div>
+      <p class="text-4xl font-bold mb-2" id="adminTotalUsers">0</p>
+      <p class="text-lg opacity-90">Total Users</p>
+     </div>
+     <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+      <div class="text-5xl mb-3">
+       🎯
+      </div>
+      <p class="text-4xl font-bold mb-2" id="adminTrialUsers">0</p>
+      <p class="text-lg opacity-90">Trial Users</p>
+     </div>
+     <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+      <div class="text-5xl mb-3">
+       ✅
+      </div>
+      <p class="text-4xl font-bold mb-2" id="adminApprovedUsers">0</p>
+      <p class="text-lg opacity-90">Approved</p>
+     </div>
+     <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+      <div class="text-5xl mb-3">
+       &#9203;
+      </div>
+      <p class="text-4xl font-bold mb-2" id="adminPendingUsers">0</p>
+      <p class="text-lg opacity-90">Pending</p>
+     </div>
+    </div><!-- Activity Logs Section -->
+    <div class="card p-8 mb-10">
+     <div class="flex justify-between items-center mb-6">
+      <h2 class="text-3xl font-bold text-gray-800">📋 Activity Logs</h2><button class="btn btn-primary" onclick="exportActivityLogs()">📥 Export Logs</button>
+     </div>
+     <div class="overflow-x-auto" style="max-height: 400px; overflow-y: auto;">
+      <table class="table">
+       <thead style="position: sticky; top: 0; z-index: 10;">
+        <tr>
+         <th>Timestamp</th>
+         <th>User</th>
+         <th>Activity</th>
+         <th>Details</th>
+        </tr>
+       </thead>
+       <tbody id="activityLogsTable">
+        <tr>
+         <td colspan="4" class="text-center text-gray-500 py-10">No activity logs yet</td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </div><!-- Users Management Section -->
+    <div class="card p-8">
+     <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+      <h2 class="text-3xl font-bold text-gray-800">All Registered Users</h2><button class="btn btn-primary" onclick="exportUsersToCSV()">📥 Export to CSV</button>
+     </div><!-- Search Bar -->
+     <div class="mb-6"><label for="adminSearchInput" class="block text-gray-700 mb-2 font-semibold">🔍 Search Users</label> <input type="text" id="adminSearchInput" class="input-field" placeholder="Search by name, email, or username..." oninput="filterUsers()">
+     </div><!-- Filter Buttons -->
+     <div class="mb-8"><label class="block text-gray-700 mb-3 font-semibold">🎯 Filter by Status</label>
+      <div class="flex flex-wrap gap-3"><button class="filter-btn active" data-filter="all" onclick="setFilter('all')"> All Users <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countAll">0</span> </button> <button class="filter-btn" data-filter="trial" onclick="setFilter('trial')"> Trial <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countTrial">0</span> </button> <button class="filter-btn" data-filter="pending" onclick="setFilter('pending')"> Pending Payment <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countPending">0</span> </button> <button class="filter-btn" data-filter="approved" onclick="setFilter('approved')"> Approved <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countApproved">0</span> </button> <button class="filter-btn" data-filter="expired" onclick="setFilter('expired')"> Expired <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countExpired">0</span> </button> <button class="filter-btn" data-filter="deleted" onclick="setFilter('deleted')"> Deleted <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countDeleted">0</span> </button>
+      </div>
+     </div>
+     <div class="overflow-x-auto">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Name</th>
+         <th>Email</th>
+         <th>Username</th>
+         <th>Status</th>
+         <th>Password</th>
+         <th>Joined Date</th>
+         <th>Actions</th>
+        </tr>
+       </thead>
+       <tbody id="adminUserTable">
+        <tr>
+         <td colspan="7" class="text-center text-gray-500 py-10">No users registered yet</td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+  </div><!-- Admin User Management Modal -->
+  <div id="adminUserModal" style="display: none;">
+   <div class="modal-overlay" onclick="closeAdminUserModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+     <div class="p-10">
+      <div class="text-center mb-8">
+       <div class="text-6xl mb-4">
+        👤
+       </div>
+       <h3 class="text-4xl font-bold text-gray-800 mb-2" id="adminModalUserName">User Management</h3>
+       <p class="text-gray-600 text-lg" id="adminModalUserEmail"></p>
+      </div><!-- View Payment Proof Section -->
+      <div class="card p-8 mb-6 bg-gradient-to-r from-purple-50 to-blue-50" id="adminPaymentProofSection" style="display: none;">
+       <h4 class="text-2xl font-bold text-gray-800 mb-4">📷 Payment Proof</h4>
+       <div class="text-center"><img id="adminPaymentProofImage" src="" alt="Payment Proof" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-bottom: 16px;" onerror="this.style.display='none';">
+        <p id="adminNoPaymentProof" class="text-gray-600">No payment proof uploaded</p>
+       </div>
+      </div><!-- Approve Payment Section -->
+      <div class="card p-8 mb-6 bg-gradient-to-r from-green-50 to-emerald-50">
+       <h4 class="text-2xl font-bold text-gray-800 mb-4">💳 Approve Payment &amp; Upload Card Details</h4>
+       <form id="approvePaymentForm" onsubmit="handleApprovePayment(event)">
+        <div class="mb-4"><label for="approveCardSlot" class="block text-gray-700 mb-2 font-semibold">Card Slot Number *</label> <input type="number" id="approveCardSlot" class="input-field" min="1" max="10" placeholder="Enter slot number (1-10)" required>
+        </div>
+        <div class="mb-4"><label for="adminCardDesignUpload" class="block text-gray-700 mb-2 font-semibold">Upload Card Design Image</label>
+         <div class="text-center"><img id="adminCardDesignPreview" style="display: none; max-width: 300px; height: auto; border-radius: 12px; margin: 0 auto 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);" alt="Card Design">
+          <div class="mb-3"><label for="adminCardDesignUpload" class="btn btn-primary cursor-pointer">📷 Upload Card Design</label> <input type="file" id="adminCardDesignUpload" accept="image/*" style="display: none;" onchange="handleAdminCardDesignUpload(event)"> <button type="button" class="btn btn-secondary ml-4" onclick="removeAdminCardDesign()" id="removeAdminCardDesignBtn" style="display: none;">🗑️ Remove</button>
+          </div>
+          <p class="text-sm text-gray-500">JPG, PNG or GIF (Max 5MB)</p>
+         </div>
+        </div>
+        <div class="mb-4"><label for="adminNfcSerial" class="block text-gray-700 mb-2 font-semibold">NFC Serial Number</label> <input type="text" id="adminNfcSerial" class="input-field" placeholder="Enter NFC serial number">
+        </div>
+        <div class="mb-4"><label for="adminNfcPassword" class="block text-gray-700 mb-2 font-semibold">NFC Lock Password</label> <input type="text" id="adminNfcPassword" class="input-field" placeholder="Enter NFC lock password">
+        </div><button type="submit" class="btn btn-primary w-full">✅ Approve &amp; Activate Card</button>
+       </form>
+      </div><!-- Reset Password Section -->
+      <div class="card p-8 mb-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+       <h4 class="text-2xl font-bold text-gray-800 mb-4">🔑 Reset Password</h4>
+       <form id="adminResetPasswordForm" onsubmit="handleAdminResetPassword(event)">
+        <div class="mb-4"><label class="block text-gray-700 mb-2 font-semibold">New Password *</label> <input type="text" id="adminNewPassword" class="input-field" placeholder="Enter new password" required minlength="6">
+        </div><button type="submit" class="btn btn-primary w-full">🔐 Reset Password</button>
+       </form>
+      </div><!-- Delete User Section -->
+      <div class="card p-8 bg-gradient-to-r from-red-50 to-pink-50">
+       <h4 class="text-2xl font-bold text-gray-800 mb-4">🗑️ Delete User Account</h4>
+       <p class="text-gray-600 mb-4">This action cannot be undone. All user data will be permanently deleted.</p>
+       <div id="deleteUserConfirm"><button class="btn btn-danger w-full" onclick="showDeleteConfirmation()">⚠️ Delete User Account</button>
+       </div>
+       <div id="deleteUserFinal" style="display: none;">
+        <p class="text-red-600 font-bold mb-4 text-center">Are you sure? This cannot be undone!</p>
+        <div class="flex gap-4"><button class="btn btn-danger flex-1" onclick="handleDeleteUser()">✅ Yes, Delete</button> <button class="btn btn-secondary flex-1" onclick="hideDeleteConfirmation()">❌ Cancel</button>
+        </div>
+       </div>
+      </div>
+      <div class="mt-8 text-center"><button class="btn btn-secondary text-lg px-8" onclick="closeAdminUserModal()">Close</button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  
+  <div id="orderCardModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000;">
+    <div class="modal-overlay" onclick="closeOrderCardModal()">
+      <div class="modal-content" onclick="event.stopPropagation()" style="position: relative; z-index: 10001;">
+        <div class="p-10">
+          <div class="text-center mb-8">
+            <div class="text-6xl mb-4">📇</div>
+            <h3 class="text-4xl font-bold text-gray-800 mb-2">Order NFC Business Card</h3>
+            <p class="text-gray-600 text-lg">Card Slot <span id="orderCardSlot">1</span> • RM 99 per card</p>
+          </div>
+          <form id="orderCardForm" onsubmit="handleOrderCard(event)">
+            <div class="mb-6">
+              <label for="orderDesign" class="block text-gray-700 mb-2 font-semibold">Card Design *</label>
+              <select id="orderDesign" class="input-field" required onchange="updateCardDesignPreview()">
+                <option value="Classic Black">Classic Black - Professional matte finish</option>
+                <option value="Premium White">Premium White - Clean modern look</option>
+                <option value="Metallic Silver">Metallic Silver - Sleek metallic finish</option>
+                <option value="Gold Edition">Gold Edition - Luxury gold accent</option>
+                <option value="Custom Design">Custom Design - Contact us for details</option>
+              </select>
+              <div class="mt-4 text-center">
+                <img id="cardDesignPreview" src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&amp;h=250&amp;fit=crop&amp;q=80" alt="Card Preview" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);" onerror="this.style.display='none';">
+              </div>
+            </div>
+            <div class="mb-6">
+              <label for="orderQuantity" class="block text-gray-700 mb-2 font-semibold">Quantity *</label>
+              <select id="orderQuantity" class="input-field" required>
+                <option value="1">1 Card - RM 99</option>
+                <option value="2">2 Cards - RM 198</option>
+                <option value="3">3 Cards - RM 297</option>
+                <option value="5">5 Cards - RM 495</option>
+              </select>
+            </div>
+            <div class="mb-6">
+              <label for="orderAddress" class="block text-gray-700 mb-2 font-semibold">Shipping Address *</label>
+              <textarea id="orderAddress" class="input-field" rows="3" placeholder="Enter your delivery address" required></textarea>
+            </div>
+            <div class="mb-6">
+              <label for="orderNotes" class="block text-gray-700 mb-2 font-semibold">Special Notes (Optional)</label>
+              <textarea id="orderNotes" class="input-field" rows="2" placeholder="Any special requests or instructions?"></textarea>
+            </div>
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl mb-6">
+              <h4 class="font-bold text-xl text-gray-800 mb-3">💳 Payment Information</h4>
+              <p class="text-gray-700 mb-2"><strong>Bank:</strong> Maybank Berhad</p>
+              <p class="text-gray-700 mb-2"><strong>Account Number:</strong> 164810240562</p>
+              <p class="text-gray-700 mb-4"><strong>Account Name:</strong> DuoBuddy Enterprise</p>
+              <p class="text-sm text-gray-600 mb-4">Please transfer the amount and upload your payment proof below.</p>
+            </div>
+            <div class="mb-8">
+              <label for="paymentProofUpload" class="block text-gray-700 mb-2 font-semibold">Upload Payment Proof *</label>
+              <div class="text-center">
+                <img id="paymentProofPreview" style="display: none; max-width: 300px; height: auto; border-radius: 12px; margin: 0 auto 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);" alt="Payment Proof">
+                <div class="mb-3">
+                  <input type="file" id="paymentProofUpload" accept="image/*" style="display: none;" onchange="handlePaymentProofUpload(event)">
+                  <button type="button" class="btn btn-primary" onclick="document.getElementById('paymentProofUpload').click()">📷 Upload Payment Proof</button>
+                  <button type="button" class="btn btn-secondary ml-4" onclick="removePaymentProof()" id="removePaymentProofBtn" style="display: none;">&#128465;&#65039; Remove</button>
+                </div>
+                <p class="text-sm text-gray-500">JPG, PNG or GIF (Max 10MB) - Screenshot of bank transfer</p>
+              </div>
+            </div>
+            <div class="flex gap-4 justify-center">
+              <button type="submit" class="btn btn-primary text-lg px-8">🛒 Place Order</button>
+              <button type="button" class="btn btn-secondary text-lg px-8" onclick="closeOrderCardModal()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewCardModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000;">
+    <div class="modal-overlay" onclick="closeViewCardModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="p-10">
+          <div class="text-center mb-8">
+            <div class="text-6xl mb-4">🎴</div>
+            <h3 class="text-4xl font-bold text-gray-800 mb-2">Card Details</h3>
+            <p class="text-gray-600 text-lg">Card Slot <span id="viewCardSlot">1</span></p>
+          </div>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 class="font-bold text-xl text-gray-800 mb-4">📄 Card Information</h4>
+              <div class="bg-gray-50 p-6 rounded-2xl space-y-3">
+                <p class="text-gray-700"><span class="font-semibold">Design:</span> <span id="viewCardDesign">Classic Black</span></p>
+                <p class="text-gray-700"><span class="font-semibold">Quantity:</span> <span id="viewCardQuantity">1</span></p>
+                <p class="text-gray-700"><span class="font-semibold">Status:</span> <span id="viewCardStatus">Active</span></p>
+              </div>
+              <div id="viewCardNfcDetails" style="display: none;" class="mt-6">
+                <h4 class="font-bold text-xl text-gray-800 mb-4">🔐 NFC Details</h4>
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl space-y-3">
+                  <p class="text-gray-700"><span class="font-semibold">Serial Number:</span> <span id="viewNfcSerial" class="font-mono text-sm">Not assigned</span></p>
+                  <p class="text-gray-700"><span class="font-semibold">Lock Password:</span> <span id="viewNfcPassword" class="font-mono text-sm">Not assigned</span></p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h4 class="font-bold text-xl text-gray-800 mb-4">🎨 Card Design Preview</h4>
+              <img id="viewCardDesignImage" src="" alt="Card Design" style="display: none; width: 100%; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" onerror="this.style.display='none';">
+              <div id="viewCardDesignPlaceholder" style="width: 100%; height: 250px; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-weight: bold; font-size: 18px;">No design image uploaded yet</div>
+            </div>
+          </div>
+          <div class="mt-8 text-center">
+            <button class="btn btn-secondary text-lg px-8" onclick="closeViewCardModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bulkOrderModal" style="display: none;">
+    <div class="modal-overlay" onclick="closeBulkOrderModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="p-10">
+          <div class="text-center mb-8">
+            <div class="text-6xl mb-4">🏢</div>
+            <h3 class="text-4xl font-bold text-gray-800 mb-2">Request Bulk Order Quote</h3>
+            <p class="text-gray-600 text-lg">Fill in your details and we'll contact you within 24 hours</p>
+          </div>
+          <form id="bulkOrderForm" onsubmit="handleBulkOrderRequest(event)">
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label for="bulkCompanyName" class="block text-gray-700 mb-2 font-semibold">Company Name *</label>
+                <input type="text" id="bulkCompanyName" class="input-field" placeholder="Your Company Ltd" required>
+              </div>
+              <div>
+                <label for="bulkContactPerson" class="block text-gray-700 mb-2 font-semibold">Contact Person *</label>
+                <input type="text" id="bulkContactPerson" class="input-field" placeholder="John Doe" required>
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label for="bulkEmail" class="block text-gray-700 mb-2 font-semibold">Email Address *</label>
+                <input type="email" id="bulkEmail" class="input-field" placeholder="contact@company.com" required>
+              </div>
+              <div>
+                <label for="bulkPhone" class="block text-gray-700 mb-2 font-semibold">Phone Number *</label>
+                <input type="tel" id="bulkPhone" class="input-field" placeholder="+60 12-345 6789" required>
+              </div>
+            </div>
+            <div class="mb-6">
+              <label for="bulkQuantity" class="block text-gray-700 mb-2 font-semibold">Number of Cards Needed *</label>
+              <select id="bulkQuantity" class="input-field" required>
+                <option value="">Select quantity range</option>
+                <option value="10-25">10-25 Cards (RM 90/card)</option>
+                <option value="26-50">26-50 Cards (RM 80/card)</option>
+                <option value="51-100">51-100 Cards (RM 70/card)</option>
+                <option value="100+">100+ Cards (RM 70/card - Custom pricing available)</option>
+              </select>
+            </div>
+            <div class="mb-8">
+              <label for="bulkMessage" class="block text-gray-700 mb-2 font-semibold">Additional Requirements (Optional)</label>
+              <textarea id="bulkMessage" class="input-field" rows="4" placeholder="Tell us about your specific needs, timeline, design preferences, etc."></textarea>
+            </div>
+            <div class="flex gap-4 justify-center">
+              <button type="submit" class="btn btn-primary text-lg px-8">📤 Submit Request</button>
+              <button type="button" class="btn btn-secondary text-lg px-8" onclick="closeBulkOrderModal()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div id="footerLogoBadge" class="footer-logo-badge" style="display:inline-flex;">DB</div>
+        <span>DuoBuddy</span>
+      </div>
+      <div class="footer-links">
+        <span>Reserved by DuoBuddy</span>
+        <a href="mailto:enquiry@duobuddy.com">enquiry@duobuddy.com</a>
+        <a href="https://wa.me/60108094829" target="_blank" rel="noopener noreferrer">WhatsApp: 0108094829</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    const API_BASE = (location.port === '5050' ? '' : ((['localhost','127.0.0.1'].includes(location.hostname)) ? 'http://localhost:5050' : ''));
+    async function apiRequest(path, opts) {
+      const o = opts || {};
+      const h = o.headers || {};
+      const method = (o.method || 'GET').toUpperCase();
+      const baseHeaders = { ...h };
+      if (method !== 'GET' && method !== 'HEAD') baseHeaders['Content-Type'] = baseHeaders['Content-Type'] || 'application/json';
+      return fetch(API_BASE + path, { ...o, credentials: 'include', headers: baseHeaders });
+    }
+    if (!window.dataSdk) {
+      (function(){
+        var storeKey = '__duobuddy_store__';
+        function read() { try { return JSON.parse(localStorage.getItem(storeKey) || '[]'); } catch(e) { return []; } }
+        function write(data) { try { localStorage.setItem(storeKey, JSON.stringify(data)); } catch(e) {} }
+        var data = read();
+        var handler = null;
+        var idSeq = Date.now();
+        window.dataSdk = {
+          init: async function(h){ handler = h; if (handler && handler.onDataChanged) handler.onDataChanged(data); return { isOk: true }; },
+          create: async function(obj){ var o = { ...obj, __backendId: (++idSeq).toString() }; data.push(o); write(data); if (handler && handler.onDataChanged) handler.onDataChanged(data); return { isOk: true, value: o }; },
+          update: async function(obj){ var idx = data.findIndex(function(x){ return x.__backendId === obj.__backendId; }); if (idx >= 0) { data[idx] = obj; } else { data.push(obj); } write(data); if (handler && handler.onDataChanged) handler.onDataChanged(data); return { isOk: true, value: obj }; }
+        };
+      })();
+    }
+    if (!window.elementSdk) {
+      window.elementSdk = {
+        init: async function(){ return { isOk: true }; }
+      };
+    }
+    const RESERVED_USERNAMES = ['admin', 'support', 'login', 'signup', 'profile', 'settings', 'help', 'api', 'www'];
+
+    let allUsers = [];
+    let activityLogs = [];
+    let currentUser = null;
+    let isAdmin = false;
+    let usernameValidationTimeout = null;
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let currentSlideIndex = 0;
+    
+    const cardDesigns = [
+      {
+        name: 'Classic Black',
+        image: '',
+        description: 'Professional matte finish with elegant black metal card'
+      },
+      {
+        name: 'Premium White',
+        image: '',
+        description: 'Clean modern look with minimalist white metal finish'
+      },
+      {
+        name: 'Metallic Silver',
+        image: '',
+        description: 'Sleek silver metallic finish for a premium feel'
+      },
+      {
+        name: 'Gold Edition',
+        image: '',
+        description: 'Luxury gold metallic card for an exclusive touch'
+      },
+      {
+        name: 'Custom Design',
+        image: '',
+        description: 'Personalized metallic design tailored to your brand'
+      }
+    ];
+    
+    function changeSlide(direction) {
+      currentSlideIndex += direction;
+      if (currentSlideIndex >= cardDesigns.length) currentSlideIndex = 0;
+      if (currentSlideIndex < 0) currentSlideIndex = cardDesigns.length - 1;
+      updateSlideshow();
+    }
+    
+    function currentSlide(index) {
+      currentSlideIndex = index;
+      updateSlideshow();
+    }
+    
+    function updateSlideshow() {
+      const design = cardDesigns[currentSlideIndex];
+      const slideshow = document.getElementById('cardSlideshow');
+      const title = document.getElementById('slideTitle');
+      const description = document.getElementById('slideDescription');
+      const dots = document.getElementById('slideshowDots').children;
+      
+      if (slideshow) {
+        slideshow.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 48px;">🎴</div>`;
+      }
+      if (title) title.textContent = design.name;
+      if (description) description.textContent = design.description;
+      
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].style.background = i === currentSlideIndex ? '#3b82f6' : '#d1d5db';
+      }
+    }
+    
+    // Auto-advance slideshow
+    setInterval(() => {
+      if (document.getElementById('homepage').classList.contains('active')) {
+        changeSlide(1);
+      }
+    }, 4000);
+
+    const dataHandler = {
+      onDataChanged(data) {
+        allUsers = data.filter(d => d.type !== 'activity_log');
+        activityLogs = data.filter(d => d.type === 'activity_log').sort((a, b) => 
+          new Date(b.timestamp) - new Date(a.timestamp)
+        );
+        
+        updateAdminDashboard();
+        updateActivityLogs();
+        filterUsers();
+        
+        if (currentUser) {
+          const updated = allUsers.find(u => u.__backendId === currentUser.__backendId);
+          if (updated) {
+            currentUser = updated;
+            if (document.getElementById('my-cards').classList.contains('active')) {
+              renderCardSlots();
+            }
+          }
+        }
+      }
+    };
+
+    async function logActivity(activityType, userId, userName, details) {
+      if (allUsers.filter(u => u.type === 'activity_log').length >= 999) {
+        return;
+      }
+      
+      const log = {
+        type: 'activity_log',
+        activity_type: activityType,
+        user_id: userId || 'system',
+        name: userName || 'System',
+        details: details,
+        timestamp: new Date().toISOString(),
+        email: '',
+        password: '',
+        username: '',
+        phone: '',
+        is_admin: false,
+        data: '',
+        deleted: false
+      };
+      
+      await window.dataSdk.create(log);
+    }
+
+    async function setupAdmin() {
+      const adminExists = allUsers.find(u => u.email === 'admin@admin');
+      if (!adminExists) {
+        const profileData = {
+          jobTitle: 'Administrator',
+          company: 'DuoBuddy',
+          about: 'System Administrator',
+          created: new Date().toISOString()
+        };
+
+        const admin = {
+          email: 'admin@a',
+          password: '123',
+          name: 'Administrator',
+          username: 'systemadmin',
+          phone: '+60 12-000 0000',
+          is_admin: true,
+          data: JSON.stringify(profileData)
+        };
+
+        await window.dataSdk.create(admin);
+      }
+      
+      // Setup pre-installed user Ibrahim
+      const ibrahimExists = allUsers.find(u => u.email === 'a@a.com');
+      if (!ibrahimExists) {
+        const now = new Date();
+        const trialEnd = new Date(now);
+        trialEnd.setDate(trialEnd.getDate() + 1);
+        
+        const ibrahimProfileData = {
+          jobTitle: '',
+          company: '',
+          about: '',
+          created: now.toISOString(),
+          trialEnd: trialEnd.toISOString(),
+          cards: []
+        };
+
+        const ibrahim = {
+          email: 'a@a.com',
+          password: '123456',
+          name: 'Ibrahim',
+          username: 'ibrahim',
+          phone: '01135574829',
+          is_admin: false,
+          data: JSON.stringify(ibrahimProfileData)
+        };
+
+        await window.dataSdk.create(ibrahim);
+      }
+    }
+
+    function normalizeUsername(username) {
+      return username.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function isReservedUsername(username) {
+      return RESERVED_USERNAMES.includes(normalizeUsername(username));
+    }
+
+    function findSimilarUsernames(username) {
+      const normalized = normalizeUsername(username);
+      return allUsers.filter(u => u.username && normalizeUsername(u.username) === normalized);
+    }
+
+    function generateUsernameSuggestions(base) {
+      const suggestions = [];
+      const normalized = normalizeUsername(base);
+      
+      for (let i = 1; i <= 3; i++) {
+        const suggestion = normalized + i;
+        if (!findSimilarUsernames(suggestion).length && !isReservedUsername(suggestion)) {
+          suggestions.push(suggestion);
+        }
+      }
+      
+      return suggestions.slice(0, 3);
+    }
+
+    async function validateUsername(username, context) {
+      clearTimeout(usernameValidationTimeout);
+      
+      const urlPreview = document.getElementById(context + 'UrlPreview');
+      const validation = document.getElementById(context + 'UsernameValidation');
+      const suggestions = document.getElementById(context + 'UsernameSuggestions');
+      const input = document.getElementById(context === 'signup' ? 'signupUsername' : 'editUsername');
+      
+      if (urlPreview) urlPreview.textContent = `duobuddy.my/${username || 'username'}`;
+      
+      if (!username || username.length < 3) {
+        validation.innerHTML = '<p class="validation-message warning">⚠️ At least 3 characters required</p>';
+        suggestions.innerHTML = '';
+        input.classList.remove('success', 'error');
+        return false;
+      }
+      
+      if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+        validation.innerHTML = '<p class="validation-message error">❌ Only letters, numbers, dots, hyphens allowed</p>';
+        suggestions.innerHTML = '';
+        input.classList.add('error');
+        input.classList.remove('success');
+        return false;
+      }
+      
+      usernameValidationTimeout = setTimeout(() => {
+        if (isReservedUsername(username)) {
+          validation.innerHTML = '<p class="validation-message error">❌ Reserved username</p>';
+          input.classList.add('error');
+          input.classList.remove('success');
+          
+          const opts = generateUsernameSuggestions(username);
+          if (opts.length) {
+            suggestions.innerHTML = `
+              <p class="text-sm text-gray-600 mt-3 font-semibold">✨ Try these instead:</p>
+              <div class="flex flex-wrap gap-2 mt-2">
+                ${opts.map(s => `<span class="url-suggestion" onclick="applySuggestion('${s}', '${context}')">${s}</span>`).join('')}
+              </div>
+            `;
+          }
+          return false;
+        }
+        
+        const similar = findSimilarUsernames(username);
+        const isCurrent = context === 'edit' && currentUser && normalizeUsername(currentUser.username) === normalizeUsername(username);
+        
+        if (similar.length && !isCurrent) {
+          validation.innerHTML = '<p class="validation-message error">❌ Username already taken</p>';
+          input.classList.add('error');
+          input.classList.remove('success');
+          
+          const opts = generateUsernameSuggestions(username);
+          if (opts.length) {
+            suggestions.innerHTML = `
+              <p class="text-sm text-gray-600 mt-3 font-semibold">✨ Available alternatives:</p>
+              <div class="flex flex-wrap gap-2 mt-2">
+                ${opts.map(s => `<span class="url-suggestion" onclick="applySuggestion('${s}', '${context}')">${s}</span>`).join('')}
+              </div>
+            `;
+          }
+          return false;
+        }
+        
+        validation.innerHTML = '<p class="validation-message success">✅ Username available!</p>';
+        suggestions.innerHTML = '';
+        input.classList.add('success');
+        input.classList.remove('error');
+        return true;
+      }, 500);
+    }
+
+    function applySuggestion(suggestion, context) {
+      const inputId = context === 'signup' ? 'signupUsername' : 'editUsername';
+      document.getElementById(inputId).value = suggestion;
+      validateUsername(suggestion, context);
+    }
+
+    async function initApp() {
+      const result = await window.dataSdk.init(dataHandler);
+      if (!result.isOk) return;
+      
+      
+      if (window.elementSdk) {
+        await window.elementSdk.init({
+          defaultConfig: {},
+          onConfigChange: async (config) => {},
+          mapToCapabilities: () => ({
+            recolorables: [],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: () => new Map()
+        });
+      }
+      const observer = ('IntersectionObserver' in window) ? new IntersectionObserver((entries) => {
+        entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+      }, { threshold: 0.15 }) : null;
+      document.querySelectorAll('.reveal').forEach((el) => { if (observer) { observer.observe(el); } else { el.classList.add('visible'); } });
+      try { const r = await apiRequest('/api/users/me', { method: 'GET' }); if (r.ok) { const me = await r.json(); if (me && me.user) { currentUser = me.user; isAdmin = !!me.user.is_admin; } } } catch(e) {}
+    }
+
+    function showPage(pageId, username = null) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      window.scrollTo(0, 0);
+      
+      if (pageId === 'edit-profile') loadEditProfileForm();
+      if (pageId === 'my-cards') renderCardSlots();
+      if (pageId === 'public-profile' && username) loadPublicProfile(username);
+    }
+
+    async function loadPublicProfile(username) {
+      try {
+        const r = await apiRequest('/api/profile/' + encodeURIComponent(username), { method: 'GET' });
+        if (!r.ok) throw new Error('not found');
+        const data = await r.json();
+        const user = data.user;
+        if (!user) throw new Error('not found');
+        document.getElementById('publicProfileContent').style.display = 'block';
+        document.getElementById('publicProfileError').style.display = 'none';
+        const profileData = user.data ? JSON.parse(user.data) : {};
+        const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        const avatarEl = document.getElementById('publicProfileAvatar');
+        const imgEl = document.getElementById('publicProfileImage');
+        avatarEl.textContent = initials;
+        if (profileData.profilePicture) { avatarEl.style.display = 'none'; imgEl.src = profileData.profilePicture; imgEl.style.display = 'block'; } else { avatarEl.style.display = 'flex'; imgEl.style.display = 'none'; }
+        document.getElementById('publicProfileName').textContent = user.name;
+        document.getElementById('publicProfileTitle').textContent = profileData.jobTitle || '';
+        const emailEl = document.getElementById('publicProfileEmail');
+        emailEl.textContent = user.email; emailEl.href = `mailto:${user.email}`;
+        const phoneEl = document.getElementById('publicProfilePhone');
+        phoneEl.textContent = user.phone; phoneEl.href = `tel:${user.phone}`;
+        document.getElementById('publicProfileCompany').textContent = profileData.company || 'N/A';
+        document.getElementById('publicProfileAbout').textContent = profileData.about || 'No information provided.';
+        renderContactActions('publicProfileContactActions', user.phone, profileData.whatsapp);
+        renderSocialLinks('publicProfileSocialLinks', profileData);
+      } catch(e) {
+        document.getElementById('publicProfileContent').style.display = 'none';
+        document.getElementById('publicProfileError').style.display = 'block';
+        return;
+      }
+      const saveBtn = document.getElementById('saveContactBtn');
+      saveBtn.onclick = function() {
+        const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:${user.name}
+EMAIL:${user.email}
+TEL:${user.phone}
+ORG:${profileData.company || ''}
+TITLE:${profileData.jobTitle || ''}
+NOTE:${profileData.about || ''}
+END:VCARD`;
+        
+        const blob = new Blob([vcard], { type: 'text/vcard' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${user.name.replace(/\s+/g, '_')}.vcf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        showToast('📱 Contact saved!');
+      };
+    }
+
+    window.addEventListener('load', () => {
+      const path = window.location.hash.substring(1);
+      if (path && path !== 'homepage' && path !== '') {
+        setTimeout(() => {
+          const username = path;
+          showPage('public-profile', username);
+        }, 1000);
+      }
+    });
+    
+    window.addEventListener('hashchange', () => {
+      const path = window.location.hash.substring(1);
+      if (path && path !== 'homepage' && path !== '') {
+        const username = path;
+        showPage('public-profile', username);
+      }
+    });
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <div class="flex items-center gap-4">
+          <div class="text-3xl">${type === 'success' ? '✅' : '&#9888;&#65039;'}</div>
+          <p class="font-semibold text-lg">${message}</p>
+        </div>
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    async function handleSignup(event) {
+      event.preventDefault();
+      
+      const name = document.getElementById('signupName').value;
+      const email = document.getElementById('signupEmail').value;
+      const username = document.getElementById('signupUsername').value;
+      const password = document.getElementById('signupPassword').value;
+      const phone = document.getElementById('signupPhone').value;
+      
+      if (isReservedUsername(username)) {
+        showToast('Username is reserved', 'error');
+        return;
+      }
+      
+      document.getElementById('signupBtnText').style.display = 'none';
+      document.getElementById('signupBtnLoading').style.display = 'inline';
+      document.getElementById('signupBtn').disabled = true;
+      
+      try {
+        const r = await apiRequest('/api/auth/signup', { method: 'POST', body: JSON.stringify({ name, email, username, password, phone }) });
+        document.getElementById('signupBtnText').style.display = 'inline';
+        document.getElementById('signupBtnLoading').style.display = 'none';
+        document.getElementById('signupBtn').disabled = false;
+        if (r.ok) {
+          showToast('🎉 Account created! 1-day trial started!');
+          document.getElementById('signupForm').reset();
+          setTimeout(() => showPage('login'), 1500);
+        } else {
+          showToast('Failed to create account. Try again.', 'error');
+        }
+      } catch(e) {
+        document.getElementById('signupBtnText').style.display = 'inline';
+        document.getElementById('signupBtnLoading').style.display = 'none';
+        document.getElementById('signupBtn').disabled = false;
+        showToast('Failed to create account. Try again.', 'error');
+      }
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      
+      document.getElementById('loginBtnText').style.display = 'none';
+      document.getElementById('loginBtnLoading').style.display = 'inline';
+      document.getElementById('loginBtn').disabled = true;
+      try {
+        const r = await apiRequest('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+        document.getElementById('loginBtnText').style.display = 'inline';
+        document.getElementById('loginBtnLoading').style.display = 'none';
+        document.getElementById('loginBtn').disabled = false;
+        if (r.ok) {
+          const data = await r.json();
+          const user = data.user;
+          currentUser = user;
+          isAdmin = user.is_admin || false;
+          showToast(`🎉 Welcome back, ${user.name}!`);
+          document.getElementById('loginForm').reset();
+          if (isAdmin) { setTimeout(() => showPage('admin'), 1000); } else { loadUserProfile(user); setTimeout(() => showPage('my-cards'), 1000); }
+        } else {
+          showToast('Invalid email or password', 'error');
+        }
+      } catch(e) {
+        document.getElementById('loginBtnText').style.display = 'inline';
+        document.getElementById('loginBtnLoading').style.display = 'none';
+        document.getElementById('loginBtn').disabled = false;
+        showToast('Invalid email or password', 'error');
+      }
+    }
+
+    function updateAccountStatus() {
+      if (!currentUser) return;
+      
+      const profileData = currentUser.data ? JSON.parse(currentUser.data) : {};
+      const trialEnd = profileData.trialEnd ? new Date(profileData.trialEnd) : null;
+      const now = new Date();
+      const banner = document.getElementById('accountStatusBanner');
+      const hasActiveCard = (profileData.cards || []).some(c => c.status === 'active' || c.ordered);
+      if (profileData.paymentApproved || hasActiveCard) {
+        banner.innerHTML = '';
+        return;
+      }
+      
+      if (trialEnd && now < trialEnd) {
+        const daysLeft = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+        banner.innerHTML = `
+          <div class="trial-banner">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h3 class="text-2xl font-bold mb-2">🎉 Free Trial Active</h3>
+                <p class="text-lg opacity-90">Your trial ends in <span class="font-bold text-2xl">${daysLeft} day(s)</span>. Order your first card to continue!</p>
+              </div>
+              <span class="status-badge status-trial">Trial Mode</span>
+            </div>
+          </div>
+        `;
+      } else if (trialEnd && now >= trialEnd) {
+        banner.innerHTML = `
+          <div class="expired-banner">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h3 class="text-2xl font-bold mb-2">⚠️ Trial Expired</h3>
+                <p class="text-lg opacity-90">Your free trial has ended. Order a card to reactivate your account!</p>
+              </div>
+              <span class="status-badge status-expired">Expired</span>
+            </div>
+          </div>
+        `;
+      } else {
+        banner.innerHTML = '';
+      }
+    }
+
+    function renderCardSlots() {
+      if (!currentUser) return;
+      
+      updateAccountStatus();
+      
+      const profileData = currentUser.data ? JSON.parse(currentUser.data) : {};
+      const cards = profileData.cards || [];
+      
+      const container = document.getElementById('cardSlotsContainer');
+      container.innerHTML = '';
+      
+      for (let i = 1; i <= 10; i++) {
+        const card = cards.find(c => c.slot === i);
+        const isActive = card && card.ordered;
+        
+        const slot = document.createElement('div');
+        slot.className = `card-slot ${isActive ? 'active' : ''}`;
+        if (!isActive) {
+          slot.onclick = (e) => {
+            if (e.target.tagName !== 'BUTTON') {
+              orderCard(i);
+            }
+          };
+          slot.style.cursor = 'pointer';
+        }
+        slot.innerHTML = `
+          <div class="text-7xl mb-4">${isActive ? '&#127924;' : '➕'}</div>
+          <h3 class="text-2xl font-bold mb-3 text-gray-800">Card Slot ${i}</h3>
+          <p class="text-gray-600 mb-6 text-lg">${isActive ? '✅ Active Card' : '📦 Available Slot'}</p>
+          ${isActive ? `
+            <div class="bg-white p-4 rounded-xl mb-4">
+              <p class="text-sm text-gray-600"><span class="font-semibold">Design:</span> ${card.design || 'Classic'}</p>
+              <p class="text-sm text-gray-600"><span class="font-semibold">Status:</span> Active</p>
+            </div>
+            <button class="btn btn-secondary" onclick="event.stopPropagation(); viewCard(${i})">📋 View Details</button>
+          ` : `
+            <button class="btn btn-primary text-lg" onclick="event.stopPropagation(); orderCard(${i})">🛒 Order Card - RM 99</button>
+          `}
+        `;
+        
+        container.appendChild(slot);
+      }
+    }
+
+    let currentOrderSlot = null;
+
+    function orderCard(slot) {
+      if (!currentUser) return;
+      
+      currentOrderSlot = slot;
+      document.getElementById('orderCardSlot').textContent = slot;
+      
+      // Reset form and preview
+      document.getElementById('orderCardForm').reset();
+      document.getElementById('paymentProofPreview').style.display = 'none';
+      document.getElementById('paymentProofPreview').src = '';
+      document.getElementById('removePaymentProofBtn').style.display = 'none';
+      
+      // Show modal
+      const modal = document.getElementById('orderCardModal');
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      
+      // Update design preview
+      updateCardDesignPreview();
+    }
+    
+    function closeOrderCardModal() {
+      document.getElementById('orderCardModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+      document.getElementById('orderCardForm').reset();
+      currentOrderSlot = null;
+    }
+    
+    function updateCardDesignPreview() {
+      const design = document.getElementById('orderDesign').value;
+      const previewImg = document.getElementById('cardDesignPreview');
+      
+      // Hide image preview since external images are blocked
+      previewImg.style.display = 'none';
+    }
+    
+    function handlePaymentProofUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('Image size must be less than 10MB', 'error');
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        showToast('Please upload an image file', 'error');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imgEl = document.getElementById('paymentProofPreview');
+        imgEl.src = e.target.result;
+        imgEl.style.display = 'block';
+        document.getElementById('removePaymentProofBtn').style.display = 'inline-block';
+        
+        showToast('✅ Payment proof uploaded!');
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function triggerPaymentProofUpload() {
+      const fileInput = document.getElementById('paymentProofUpload');
+      if (fileInput) {
+        fileInput.click();
+      }
+    }
+    
+    function removePaymentProof() {
+      const imgEl = document.getElementById('paymentProofPreview');
+      imgEl.style.display = 'none';
+      imgEl.src = '';
+      document.getElementById('removePaymentProofBtn').style.display = 'none';
+      document.getElementById('paymentProofUpload').value = '';
+      
+      showToast('Payment proof removed');
+    }
+    
+    async function handleOrderCard(event) {
+      event.preventDefault();
+      
+      const paymentProofImg = document.getElementById('paymentProofPreview');
+      if (paymentProofImg.style.display === 'none' || !paymentProofImg.src) {
+        showToast('Please upload payment proof', 'error');
+        return;
+      }
+      
+      const slot = currentOrderSlot;
+      const design = document.getElementById('orderDesign').value;
+      const quantity = parseInt(document.getElementById('orderQuantity').value);
+      const address = document.getElementById('orderAddress').value;
+      const notes = document.getElementById('orderNotes').value;
+      const paymentProof = paymentProofImg.src;
+      
+      try {
+        const r = await apiRequest('/api/cards/order', { method: 'POST', body: JSON.stringify({ slot, design, quantity, address, notes, paymentProof }) });
+        if (r.ok) {
+          const data = await r.json();
+          currentUser = data.user;
+          showToast(`📦 Order placed! Awaiting admin approval.`);
+          closeOrderCardModal();
+          renderCardSlots();
+        } else {
+          showToast('Failed to place order', 'error');
+        }
+      } catch(e) {
+        showToast('Failed to place order', 'error');
+      }
+    }
+
+    function viewCard(slot) {
+      if (!currentUser) return;
+      
+      const profileData = currentUser.data ? JSON.parse(currentUser.data) : {};
+      const card = (profileData.cards || []).find(c => c.slot === slot);
+      
+      if (!card) return;
+      
+      document.getElementById('viewCardSlot').textContent = slot;
+      document.getElementById('viewCardDesign').textContent = card.design || 'N/A';
+      document.getElementById('viewCardQuantity').textContent = card.quantity || 1;
+      document.getElementById('viewCardStatus').textContent = card.ordered ? 'Active ✅' : 'Pending ⏳';
+      
+      // Show card design image if available
+      const designImg = document.getElementById('viewCardDesignImage');
+      const designPlaceholder = document.getElementById('viewCardDesignPlaceholder');
+      
+      if (card.designImage) {
+        designImg.src = card.designImage;
+        designImg.style.display = 'block';
+        designPlaceholder.style.display = 'none';
+      } else {
+        designImg.style.display = 'none';
+        designPlaceholder.style.display = 'flex';
+      }
+      
+      // Show NFC details if available
+      const nfcDetails = document.getElementById('viewCardNfcDetails');
+      if (card.nfcSerial || card.nfcPassword) {
+        nfcDetails.style.display = 'block';
+        document.getElementById('viewNfcSerial').textContent = card.nfcSerial || 'Not assigned';
+        document.getElementById('viewNfcPassword').textContent = card.nfcPassword || 'Not assigned';
+      } else {
+        nfcDetails.style.display = 'none';
+      }
+      
+      document.getElementById('viewCardModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeViewCardModal() {
+      document.getElementById('viewCardModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    function loadUserProfile(user) {
+      const profileData = user.data ? JSON.parse(user.data) : {};
+      const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+      
+      const avatarEl = document.getElementById('profileAvatar');
+      avatarEl.textContent = initials;
+      
+      if (profileData.profilePicture) {
+        avatarEl.style.display = 'none';
+        const imgEl = document.createElement('img');
+        imgEl.src = profileData.profilePicture;
+        imgEl.alt = user.name;
+        imgEl.style.cssText = 'width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 24px; object-fit: cover; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);';
+        avatarEl.parentElement.insertBefore(imgEl, avatarEl);
+      } else {
+        avatarEl.style.display = 'flex';
+      }
+      
+      document.getElementById('profileName').textContent = user.name;
+      document.getElementById('profileTitle').textContent = profileData.jobTitle || 'Add your job title';
+      document.getElementById('profileEmail').textContent = user.email;
+      document.getElementById('profilePhone').textContent = user.phone;
+      document.getElementById('profileCompany').textContent = profileData.company || 'Add your company';
+      document.getElementById('profileAbout').textContent = profileData.about || 'Tell people about yourself...';
+      document.getElementById('profileURL').textContent = `duobuddy.my/${user.username}`;
+      
+      renderContactActions('profileContactActions', user.phone, profileData.whatsapp);
+      renderSocialLinks('profileSocialLinks', profileData);
+    }
+    
+    function renderContactActions(containerId, phone, whatsapp) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      
+      const whatsappNum = whatsapp || phone;
+      const cleanPhone = phone.replace(/[^0-9+]/g, '');
+      const cleanWhatsapp = whatsappNum.replace(/[^0-9+]/g, '');
+      
+      container.innerHTML = `
+        <a href="tel:${cleanPhone}" class="contact-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+          📞 Call
+        </a>
+        <a href="sms:${cleanPhone}" class="contact-btn" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;">
+          💬 Message
+        </a>
+        <a href="https://wa.me/${cleanWhatsapp}" target="_blank" rel="noopener noreferrer" class="contact-btn" style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white;">
+          📱 WhatsApp
+        </a>
+      `;
+    }
+    
+    function renderSocialLinks(containerId, profileData) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      
+      const socials = [];
+      
+      // Helper function to build URLs from usernames
+      function buildSocialUrl(username, platform) {
+        if (!username) return null;
+        
+        // If it already looks like a full URL, use it as-is
+        if (username.startsWith('http://') || username.startsWith('https://')) {
+          return username;
+        }
+        
+        // Remove @ symbol if present
+        const cleanUsername = username.replace(/^@/, '');
+        
+        switch(platform) {
+          case 'facebook':
+            return `https://facebook.com/${cleanUsername}`;
+          case 'instagram':
+            return `https://instagram.com/${cleanUsername}`;
+          case 'linkedin':
+            return `https://linkedin.com/in/${cleanUsername}`;
+          case 'twitter':
+            return `https://twitter.com/${cleanUsername}`;
+          case 'tiktok':
+            return `https://tiktok.com/@${cleanUsername}`;
+          case 'youtube':
+            return `https://youtube.com/@${cleanUsername}`;
+          default:
+            return username;
+        }
+      }
+      
+      if (profileData.facebook) {
+        socials.push({ 
+          name: 'Facebook', 
+          url: buildSocialUrl(profileData.facebook, 'facebook'), 
+          icon: '&#128216;', 
+          color: '#1877F2' 
+        });
+      }
+      if (profileData.instagram) {
+        socials.push({ 
+          name: 'Instagram', 
+          url: buildSocialUrl(profileData.instagram, 'instagram'), 
+          icon: '📷', 
+          color: '#E4405F' 
+        });
+      }
+      if (profileData.linkedin) {
+        socials.push({ 
+          name: 'LinkedIn', 
+          url: buildSocialUrl(profileData.linkedin, 'linkedin'), 
+          icon: '&#128188;', 
+          color: '#0A66C2' 
+        });
+      }
+      if (profileData.twitter) {
+        socials.push({ 
+          name: 'Twitter', 
+          url: buildSocialUrl(profileData.twitter, 'twitter'), 
+          icon: '🐦', 
+          color: '#1DA1F2' 
+        });
+      }
+      if (profileData.tiktok) {
+        socials.push({ 
+          name: 'TikTok', 
+          url: buildSocialUrl(profileData.tiktok, 'tiktok'), 
+          icon: '🎵', 
+          color: '#000000' 
+        });
+      }
+      if (profileData.youtube) {
+        socials.push({ 
+          name: 'YouTube', 
+          url: buildSocialUrl(profileData.youtube, 'youtube'), 
+          icon: '&#128250;', 
+          color: '#FF0000' 
+        });
+      }
+      if (profileData.website) {
+        const websiteUrl = profileData.website.startsWith('http') ? 
+          profileData.website : 
+          `https://${profileData.website}`;
+        socials.push({ 
+          name: 'Website', 
+          url: websiteUrl, 
+          icon: '🌐', 
+          color: '#667eea' 
+        });
+      }
+      if (profileData.other) {
+        const otherUrl = profileData.other.startsWith('http') ? 
+          profileData.other : 
+          `https://${profileData.other}`;
+        socials.push({ 
+          name: 'Link', 
+          url: otherUrl, 
+          icon: '🔗', 
+          color: '#764ba2' 
+        });
+      }
+      
+      if (socials.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      
+      container.innerHTML = `
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">🌐 Connect With Me</h3>
+        <div class="social-links">
+          ${socials.map(social => `
+            <a href="${social.url}" target="_blank" rel="noopener noreferrer" class="social-btn" style="background: ${social.color}; color: white;">
+              <span class="text-2xl">${social.icon}</span>
+              <span>${social.name}</span>
+            </a>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function handleProfilePictureUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('Image size must be less than 10MB', 'error');
+        event.target.value = '';
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        showToast('Please upload an image file', 'error');
+        event.target.value = '';
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        showImageCropModal(e.target.result);
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+    
+    let cropImage = null;
+    let cropCanvas = null;
+    let cropCtx = null;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+    let scale = 1;
+    
+    function showImageCropModal(imageSrc) {
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.style.zIndex = '99999';
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;" onclick="event.stopPropagation()">
+          <div class="p-8">
+            <h3 class="text-3xl font-bold text-gray-800 mb-6 text-center">✂️ Crop Profile Picture</h3>
+            <div style="position: relative; width: 400px; height: 400px; margin: 0 auto 20px; background: #f3f4f6; border-radius: 16px; overflow: hidden;">
+              <canvas id="cropCanvas" width="400" height="400" style="display: block; cursor: move;"></canvas>
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; border: 3px solid #667eea; border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);"></div>
+            </div>
+            <div class="mb-6">
+              <label class="block text-gray-700 mb-2 font-semibold text-center">Zoom</label>
+              <input type="range" id="cropZoom" min="0.5" max="3" step="0.1" value="1" class="w-full" style="width: 100%;">
+            </div>
+            <div class="flex gap-4 justify-center">
+              <button class="btn btn-primary" onclick="applyCrop()">✅ Apply Crop</button>
+              <button class="btn btn-secondary" onclick="cancelCrop()">❌ Cancel</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      document.body.style.overflow = 'hidden';
+      
+      cropCanvas = document.getElementById('cropCanvas');
+      cropCtx = cropCanvas.getContext('2d');
+      cropImage = new Image();
+      cropImage.onload = function() {
+        scale = 1;
+        offsetX = 0;
+        offsetY = 0;
+        drawCropPreview();
+      };
+      cropImage.src = imageSrc;
+      
+      cropCanvas.addEventListener('mousedown', startDrag);
+      cropCanvas.addEventListener('mousemove', drag);
+      cropCanvas.addEventListener('mouseup', endDrag);
+      cropCanvas.addEventListener('mouseleave', endDrag);
+      
+      cropCanvas.addEventListener('touchstart', handleTouchStart);
+      cropCanvas.addEventListener('touchmove', handleTouchMove);
+      cropCanvas.addEventListener('touchend', endDrag);
+      
+      document.getElementById('cropZoom').addEventListener('input', function(e) {
+        scale = parseFloat(e.target.value);
+        drawCropPreview();
+      });
+    }
+    
+    function startDrag(e) {
+      isDragging = true;
+      startX = e.clientX - offsetX;
+      startY = e.clientY - offsetY;
+    }
+    
+    function drag(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      offsetX = e.clientX - startX;
+      offsetY = e.clientY - startY;
+      drawCropPreview();
+    }
+    
+    function endDrag() {
+      isDragging = false;
+    }
+    
+    function handleTouchStart(e) {
+      isDragging = true;
+      const touch = e.touches[0];
+      startX = touch.clientX - offsetX;
+      startY = touch.clientY - offsetY;
+    }
+    
+    function handleTouchMove(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      offsetX = touch.clientX - startX;
+      offsetY = touch.clientY - offsetY;
+      drawCropPreview();
+    }
+    
+    function drawCropPreview() {
+      if (!cropImage || !cropCtx) return;
+      
+      cropCtx.clearRect(0, 0, 400, 400);
+      cropCtx.fillStyle = '#f3f4f6';
+      cropCtx.fillRect(0, 0, 400, 400);
+      
+      const imgWidth = cropImage.width * scale;
+      const imgHeight = cropImage.height * scale;
+      
+      const x = 200 - imgWidth / 2 + offsetX;
+      const y = 200 - imgHeight / 2 + offsetY;
+      
+      cropCtx.drawImage(cropImage, x, y, imgWidth, imgHeight);
+    }
+    
+    function applyCrop() {
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = 300;
+      finalCanvas.height = 300;
+      const finalCtx = finalCanvas.getContext('2d');
+      
+      finalCtx.beginPath();
+      finalCtx.arc(150, 150, 150, 0, Math.PI * 2);
+      finalCtx.closePath();
+      finalCtx.clip();
+      
+      const imgWidth = cropImage.width * scale;
+      const imgHeight = cropImage.height * scale;
+      
+      const sourceX = 200 - imgWidth / 2 + offsetX;
+      const sourceY = 200 - imgHeight / 2 + offsetY;
+      
+      const cropX = (50 - sourceX) / scale;
+      const cropY = (50 - sourceY) / scale;
+      const cropSize = 300 / scale;
+      
+      finalCtx.drawImage(
+        cropImage,
+        cropX, cropY, cropSize, cropSize,
+        0, 0, 300, 300
+      );
+      
+      const croppedDataUrl = finalCanvas.toDataURL('image/jpeg', 0.9);
+      
+      const avatarEl = document.getElementById('editProfileAvatar');
+      const imgEl = document.getElementById('editProfileImage');
+      
+      avatarEl.style.display = 'none';
+      imgEl.src = croppedDataUrl;
+      imgEl.style.display = 'block';
+      document.getElementById('removeProfilePicBtn').style.display = 'inline-block';
+      
+      cancelCrop();
+      showToast('✅ Profile picture cropped!');
+    }
+    
+    function cancelCrop() {
+      const modal = document.querySelector('.modal-overlay');
+      if (modal) {
+        modal.remove();
+      }
+      document.body.style.overflow = 'auto';
+      cropImage = null;
+      cropCanvas = null;
+      cropCtx = null;
+    }
+
+    function removeProfilePicture() {
+      const avatarEl = document.getElementById('editProfileAvatar');
+      const imgEl = document.getElementById('editProfileImage');
+      
+      imgEl.style.display = 'none';
+      imgEl.src = '';
+      avatarEl.style.display = 'flex';
+      document.getElementById('removeProfilePicBtn').style.display = 'none';
+      document.getElementById('profilePictureUpload').value = '';
+      
+      showToast('Profile picture removed');
+    }
+
+    function loadEditProfileForm() {
+      if (!currentUser) return;
+      
+      const profileData = currentUser.data ? JSON.parse(currentUser.data) : {};
+      const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+      
+      const avatarEl = document.getElementById('editProfileAvatar');
+      const imgEl = document.getElementById('editProfileImage');
+      
+      avatarEl.textContent = initials;
+      
+      if (profileData.profilePicture) {
+        avatarEl.style.display = 'none';
+        imgEl.src = profileData.profilePicture;
+        imgEl.style.display = 'block';
+        document.getElementById('removeProfilePicBtn').style.display = 'inline-block';
+      } else {
+        avatarEl.style.display = 'flex';
+        imgEl.style.display = 'none';
+        document.getElementById('removeProfilePicBtn').style.display = 'none';
+      }
+      
+      document.getElementById('editName').value = currentUser.name;
+      document.getElementById('editUsername').value = currentUser.username;
+      document.getElementById('editJobTitle').value = profileData.jobTitle || '';
+      document.getElementById('editCompany').value = profileData.company || '';
+      document.getElementById('editPhone').value = currentUser.phone;
+      document.getElementById('editWhatsapp').value = profileData.whatsapp || '';
+      document.getElementById('editAbout').value = profileData.about || '';
+      
+      document.getElementById('editFacebook').value = profileData.facebook || '';
+      document.getElementById('editInstagram').value = profileData.instagram || '';
+      document.getElementById('editLinkedin').value = profileData.linkedin || '';
+      document.getElementById('editTwitter').value = profileData.twitter || '';
+      document.getElementById('editTiktok').value = profileData.tiktok || '';
+      document.getElementById('editYoutube').value = profileData.youtube || '';
+      document.getElementById('editWebsite').value = profileData.website || '';
+      document.getElementById('editOther').value = profileData.other || '';
+      
+      document.getElementById('editUrlPreview').textContent = `duobuddy.my/${currentUser.username}`;
+      validateUsername(currentUser.username, 'edit');
+    }
+
+    async function handleUpdateProfile(event) {
+      event.preventDefault();
+      
+      const newUsername = document.getElementById('editUsername').value;
+      
+      if (isReservedUsername(newUsername)) {
+        showToast('Username is reserved', 'error');
+        return;
+      }
+      
+      const similar = findSimilarUsernames(newUsername);
+      const isCurrent = normalizeUsername(currentUser.username) === normalizeUsername(newUsername);
+      
+      if (similar.length && !isCurrent) {
+        showToast('Username already taken', 'error');
+        return;
+      }
+      
+      document.getElementById('updateBtnText').style.display = 'none';
+      document.getElementById('updateBtnLoading').style.display = 'inline';
+      document.getElementById('updateBtn').disabled = true;
+      
+      const oldProfileData = currentUser.data ? JSON.parse(currentUser.data) : {};
+      
+      const imgEl = document.getElementById('editProfileImage');
+      const profilePicture = (imgEl.style.display !== 'none' && imgEl.src && imgEl.src !== '') ? imgEl.src : null;
+      
+      const profileData = {
+        jobTitle: document.getElementById('editJobTitle').value,
+        company: document.getElementById('editCompany').value,
+        about: document.getElementById('editAbout').value,
+        whatsapp: document.getElementById('editWhatsapp').value,
+        facebook: document.getElementById('editFacebook').value,
+        instagram: document.getElementById('editInstagram').value,
+        linkedin: document.getElementById('editLinkedin').value,
+        twitter: document.getElementById('editTwitter').value,
+        tiktok: document.getElementById('editTiktok').value,
+        youtube: document.getElementById('editYoutube').value,
+        website: document.getElementById('editWebsite').value,
+        other: document.getElementById('editOther').value,
+        profilePicture: profilePicture,
+        created: oldProfileData.created || new Date().toISOString(),
+        trialEnd: oldProfileData.trialEnd,
+        paymentApproved: oldProfileData.paymentApproved,
+        approvedDate: oldProfileData.approvedDate,
+        cards: oldProfileData.cards || []
+      };
+      
+      const updated = {
+        ...currentUser,
+        name: document.getElementById('editName').value,
+        username: newUsername,
+        phone: document.getElementById('editPhone').value,
+        data: JSON.stringify(profileData)
+      };
+      
+      const result = await window.dataSdk.update(updated);
+      
+      document.getElementById('updateBtnText').style.display = 'inline';
+      document.getElementById('updateBtnLoading').style.display = 'none';
+      document.getElementById('updateBtn').disabled = false;
+      
+      if (result.isOk) {
+        currentUser = updated;
+        loadUserProfile(updated);
+        showToast('✅ Profile updated successfully!');
+        await logActivity('profile_edit', updated.__backendId, updated.name, `Profile updated for ${updated.email}`);
+        setTimeout(() => showPage('profile'), 1000);
+      } else {
+        showToast('Failed to update profile', 'error');
+      }
+    }
+
+    async function handleChangePassword(event) {
+      event.preventDefault();
+      
+      if (!currentUser) return;
+      
+      const current = document.getElementById('currentPassword').value;
+      const newPass = document.getElementById('newPassword').value;
+      const confirm = document.getElementById('confirmPassword').value;
+      
+      if (current !== currentUser.password) {
+        showToast('Current password is incorrect', 'error');
+        return;
+      }
+      
+      if (newPass !== confirm) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
+      
+      if (newPass.length < 6) {
+        showToast('Password must be at least 6 characters', 'error');
+        return;
+      }
+      
+      document.getElementById('changePasswordBtnText').style.display = 'none';
+      document.getElementById('changePasswordBtnLoading').style.display = 'inline';
+      document.getElementById('changePasswordBtn').disabled = true;
+      
+      // Preserve existing profile data structure
+      const existingData = currentUser.data ? JSON.parse(currentUser.data) : {};
+      
+      const updated = { 
+        ...currentUser, 
+        password: newPass,
+        data: JSON.stringify(existingData)
+      };
+      
+      const result = await window.dataSdk.update(updated);
+      
+      document.getElementById('changePasswordBtnText').style.display = 'inline';
+      document.getElementById('changePasswordBtnLoading').style.display = 'none';
+      document.getElementById('changePasswordBtn').disabled = false;
+      
+      if (result.isOk) {
+        currentUser = updated;
+        showToast('Password changed successfully!');
+        await logActivity('password_change', updated.__backendId, updated.name, `Password changed for ${updated.email}`);
+        document.getElementById('changePasswordForm').reset();
+        setTimeout(() => showPage(isAdmin ? 'admin' : 'my-cards'), 1000);
+      } else {
+        showToast('Failed to change password', 'error');
+      }
+    }
+
+    function getUserStatus(user) {
+      if (user.deleted) return 'deleted';
+      
+      const profileData = user.data ? JSON.parse(user.data) : {};
+      const trialEnd = profileData.trialEnd ? new Date(profileData.trialEnd) : null;
+      const now = new Date();
+      
+      if (profileData.paymentApproved) return 'approved';
+      if (trialEnd && now >= trialEnd) return 'expired';
+      if (trialEnd && now < trialEnd) return 'trial';
+      return 'pending';
+    }
+
+    function getStatusBadge(status) {
+      const badges = {
+        trial: '<span class="status-badge status-trial">Trial</span>',
+        pending: '<span class="status-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">Pending</span>',
+        approved: '<span class="status-badge status-active">Approved</span>',
+        expired: '<span class="status-badge status-expired">Expired</span>',
+        deleted: '<span class="status-badge" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white;">Deleted</span>'
+      };
+      return badges[status] || '';
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`.filter-btn[data-filter="${filter}"]`).classList.add('active');
+      filterUsers();
+    }
+
+    function filterUsers() {
+      const searchTerm = document.getElementById('adminSearchInput')?.value.toLowerCase() || '';
+      currentSearch = searchTerm;
+      
+      const users = allUsers.filter(u => !u.is_admin);
+      
+      const filteredUsers = users.filter(user => {
+        const matchesSearch = 
+          user.name.toLowerCase().includes(searchTerm) ||
+          user.email.toLowerCase().includes(searchTerm) ||
+          user.username.toLowerCase().includes(searchTerm);
+        
+        if (!matchesSearch) return false;
+        
+        const status = getUserStatus(user);
+        if (currentFilter === 'all') return true;
+        return status === currentFilter;
+      });
+      
+      const tbody = document.getElementById('adminUserTable');
+      
+      if (!filteredUsers.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-gray-500 py-10 text-lg">No users found matching your criteria</td></tr>';
+      } else {
+        tbody.innerHTML = filteredUsers.map(u => {
+          const status = getUserStatus(u);
+          const isDeleted = u.deleted;
+          return `
+            <tr style="${isDeleted ? 'opacity: 0.5;' : ''}">
+              <td class="font-semibold">${u.name}</td>
+              <td>${u.email}</td>
+              <td><span class="text-purple-600 font-semibold">${u.username}</span></td>
+              <td>${getStatusBadge(status)}</td>
+              <td><span class="text-gray-600 font-mono">${u.password}</span></td>
+              <td>${u.data ? new Date(JSON.parse(u.data).created).toLocaleDateString() : 'N/A'}</td>
+              <td>
+                <button class="btn btn-primary" onclick="openAdminUserModal('${u.__backendId}')" style="padding: 8px 16px; font-size: 14px;">${isDeleted ? '👁️ View' : '⚙️ Manage'}</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function updateAdminDashboard() {
+      const users = allUsers.filter(u => !u.is_admin);
+      
+      const statusCounts = {
+        all: users.length,
+        trial: users.filter(u => getUserStatus(u) === 'trial').length,
+        pending: users.filter(u => getUserStatus(u) === 'pending').length,
+        approved: users.filter(u => getUserStatus(u) === 'approved').length,
+        expired: users.filter(u => getUserStatus(u) === 'expired').length,
+        deleted: users.filter(u => u.deleted).length
+      };
+      
+      document.getElementById('adminTotalUsers').textContent = statusCounts.all;
+      document.getElementById('adminTrialUsers').textContent = statusCounts.trial;
+      document.getElementById('adminApprovedUsers').textContent = statusCounts.approved;
+      document.getElementById('adminPendingUsers').textContent = statusCounts.pending;
+      
+      document.getElementById('countAll').textContent = statusCounts.all;
+      document.getElementById('countTrial').textContent = statusCounts.trial;
+      document.getElementById('countPending').textContent = statusCounts.pending;
+      document.getElementById('countApproved').textContent = statusCounts.approved;
+      document.getElementById('countExpired').textContent = statusCounts.expired;
+      document.getElementById('countDeleted').textContent = statusCounts.deleted;
+    }
+
+    function updateActivityLogs() {
+      const tbody = document.getElementById('activityLogsTable');
+      
+      if (!activityLogs.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 py-10">No activity logs yet</td></tr>';
+        return;
+      }
+      
+      const recentLogs = activityLogs.slice(0, 50);
+      
+      tbody.innerHTML = recentLogs.map(log => {
+        const date = new Date(log.timestamp);
+        const formattedDate = date.toLocaleString();
+        
+        const activityIcons = {
+          login: '🔐',
+          signup: '✨',
+          profile_edit: '✏️',
+          password_change: '🔑',
+          payment_submit: '💳',
+          payment_approve: '✅',
+          admin_reset_password: '🔧',
+          admin_delete_user: '🗑️'
+        };
+        
+        const icon = activityIcons[log.activity_type] || '&#128221;';
+        
+        return `
+          <tr>
+            <td class="text-sm">${formattedDate}</td>
+            <td class="font-semibold">${log.name}</td>
+            <td><span class="text-2xl">${icon}</span> ${log.activity_type.replace(/_/g, ' ').toUpperCase()}</td>
+            <td class="text-gray-600">${log.details}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function exportUsersToCSV() {
+      const users = allUsers.filter(u => !u.is_admin);
+      
+      if (!users.length) {
+        showToast('No users to export', 'error');
+        return;
+      }
+      
+      const headers = ['Name', 'Email', 'Username', 'Phone', 'Status', 'Password', 'Job Title', 'Company', 'Joined Date', 'Trial End', 'Payment Approved', 'Deleted'];
+      
+      const rows = users.map(u => {
+        const profileData = u.data ? JSON.parse(u.data) : {};
+        const status = getUserStatus(u);
+        
+        return [
+          u.name,
+          u.email,
+          u.username,
+          u.phone,
+          status,
+          u.password,
+          profileData.jobTitle || '',
+          profileData.company || '',
+          profileData.created ? new Date(profileData.created).toLocaleDateString() : '',
+          profileData.trialEnd ? new Date(profileData.trialEnd).toLocaleDateString() : '',
+          profileData.paymentApproved ? 'Yes' : 'No',
+          u.deleted ? 'Yes' : 'No'
+        ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(',');
+      });
+      
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      showToast('📥 Users exported to CSV!');
+      logActivity('export_csv', currentUser?.__backendId, currentUser?.name || 'Admin', `Exported ${users.length} users to CSV`);
+    }
+
+    function exportActivityLogs() {
+      if (!activityLogs.length) {
+        showToast('No activity logs to export', 'error');
+        return;
+      }
+      
+      const headers = ['Timestamp', 'User', 'Activity Type', 'Details'];
+      
+      const rows = activityLogs.map(log => {
+        return [
+          new Date(log.timestamp).toLocaleString(),
+          log.name,
+          log.activity_type,
+          log.details
+        ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(',');
+      });
+      
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `activity_logs_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      showToast('📥 Activity logs exported!');
+    }
+
+    let selectedUserId = null;
+
+    function handleAdminCardDesignUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('Image size must be less than 10MB', 'error');
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        showToast('Please upload an image file', 'error');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imgEl = document.getElementById('adminCardDesignPreview');
+        imgEl.src = e.target.result;
+        imgEl.style.display = 'block';
+        document.getElementById('removeAdminCardDesignBtn').style.display = 'inline-block';
+        
+        showToast('✅ Card design uploaded!');
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function removeAdminCardDesign() {
+      const imgEl = document.getElementById('adminCardDesignPreview');
+      imgEl.style.display = 'none';
+      imgEl.src = '';
+      document.getElementById('removeAdminCardDesignBtn').style.display = 'none';
+      document.getElementById('adminCardDesignUpload').value = '';
+      
+      showToast('Card design removed');
+    }
+
+    function openAdminUserModal(userId) {
+      const user = allUsers.find(u => u.__backendId === userId);
+      if (!user) return;
+      
+      selectedUserId = userId;
+      document.getElementById('adminModalUserName').textContent = user.name;
+      document.getElementById('adminModalUserEmail').textContent = user.email;
+      document.getElementById('adminUserModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      
+      // Show payment proof if available
+      const profileData = user.data ? JSON.parse(user.data) : {};
+      const pendingOrders = (profileData.cards || []).filter(c => c.status === 'pending_approval');
+      
+      if (pendingOrders.length > 0 && pendingOrders[0].paymentProof) {
+        document.getElementById('adminPaymentProofSection').style.display = 'block';
+        document.getElementById('adminPaymentProofImage').src = pendingOrders[0].paymentProof;
+        document.getElementById('adminPaymentProofImage').style.display = 'block';
+        document.getElementById('adminNoPaymentProof').style.display = 'none';
+        document.getElementById('approveCardSlot').value = pendingOrders[0].slot;
+      } else {
+        document.getElementById('adminPaymentProofSection').style.display = 'none';
+      }
+      
+      // Reset form fields
+      document.getElementById('approvePaymentForm').reset();
+      document.getElementById('adminNewPassword').value = '';
+      document.getElementById('adminCardDesignPreview').style.display = 'none';
+      document.getElementById('removeAdminCardDesignBtn').style.display = 'none';
+      hideDeleteConfirmation();
+    }
+
+    function closeAdminUserModal() {
+      document.getElementById('adminUserModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+      selectedUserId = null;
+    }
+
+    async function handleApprovePayment(event) {
+      event.preventDefault();
+      
+      const user = allUsers.find(u => u.__backendId === selectedUserId);
+      if (!user) return;
+      
+      const slotNumber = parseInt(document.getElementById('approveCardSlot').value);
+      const nfcSerial = document.getElementById('adminNfcSerial').value;
+      const nfcPassword = document.getElementById('adminNfcPassword').value;
+      
+      if (slotNumber < 1 || slotNumber > 10) {
+        showToast('Card slot must be between 1 and 10', 'error');
+        return;
+      }
+      
+      const designImg = document.getElementById('adminCardDesignPreview');
+      const designImage = designImg.style.display !== 'none' ? designImg.src : null;
+      try {
+        const r = await apiRequest('/api/admin/approve', { method: 'POST', body: JSON.stringify({ userId: selectedUserId, slot: slotNumber, nfcSerial, nfcPassword, designImage }) });
+        if (r.ok) {
+          const data = await r.json();
+          showToast(`✅ Payment approved! Card slot ${slotNumber} activated for ${user.name}`);
+          document.getElementById('approvePaymentForm').reset();
+          document.getElementById('adminCardDesignPreview').style.display = 'none';
+          document.getElementById('removeAdminCardDesignBtn').style.display = 'none';
+          setTimeout(() => closeAdminUserModal(), 1500);
+        } else {
+          showToast('Failed to approve payment', 'error');
+        }
+      } catch(e) {
+        showToast('Failed to approve payment', 'error');
+      }
+    }
+
+    async function handleAdminResetPassword(event) {
+      event.preventDefault();
+      
+      const user = allUsers.find(u => u.__backendId === selectedUserId);
+      if (!user) return;
+      
+      const newPassword = document.getElementById('adminNewPassword').value;
+      
+      if (newPassword.length < 6) {
+        showToast('Password must be at least 6 characters', 'error');
+        return;
+      }
+      
+      const updated = {
+        ...user,
+        password: newPassword
+      };
+      
+      const result = await window.dataSdk.update(updated);
+      
+      if (result.isOk) {
+        showToast(`🔐 Password reset for ${user.name}`);
+        await logActivity('admin_reset_password', user.__backendId, user.name, `Admin reset password for ${user.email}`);
+        document.getElementById('adminResetPasswordForm').reset();
+        setTimeout(() => closeAdminUserModal(), 1500);
+      } else {
+        showToast('Failed to reset password', 'error');
+      }
+    }
+
+    function showDeleteConfirmation() {
+      document.getElementById('deleteUserConfirm').style.display = 'none';
+      document.getElementById('deleteUserFinal').style.display = 'block';
+    }
+
+    function hideDeleteConfirmation() {
+      document.getElementById('deleteUserConfirm').style.display = 'block';
+      document.getElementById('deleteUserFinal').style.display = 'none';
+    }
+
+    async function handleDeleteUser() {
+      const user = allUsers.find(u => u.__backendId === selectedUserId);
+      if (!user) return;
+      
+      const profileData = user.data ? JSON.parse(user.data) : {};
+      profileData.deleted = true;
+      
+      const updated = {
+        ...user,
+        deleted: true,
+        data: JSON.stringify(profileData)
+      };
+      
+      const result = await window.dataSdk.update(updated);
+      
+      if (result.isOk) {
+        showToast(`🗑️ User ${user.name} marked as deleted`);
+        await logActivity('admin_delete_user', user.__backendId, user.name, `Admin deleted user ${user.email}`);
+        closeAdminUserModal();
+      } else {
+        showToast('Failed to delete user', 'error');
+      }
+    }
+
+    function handleSignOut() {
+      apiRequest('/api/auth/logout', { method: 'POST' }).finally(() => {
+        currentUser = null;
+        isAdmin = false;
+        showToast('👋 Signed out successfully');
+        setTimeout(() => showPage('homepage'), 1000);
+      });
+    }
+
+    function showBulkOrderModal() {
+      document.getElementById('bulkOrderModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeBulkOrderModal() {
+      document.getElementById('bulkOrderModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+      document.getElementById('bulkOrderForm').reset();
+    }
+
+    function handleBulkOrderRequest(event) {
+      event.preventDefault();
+      
+      const companyName = document.getElementById('bulkCompanyName').value;
+      const contactPerson = document.getElementById('bulkContactPerson').value;
+      const email = document.getElementById('bulkEmail').value;
+      const phone = document.getElementById('bulkPhone').value;
+      const quantity = document.getElementById('bulkQuantity').value;
+      const message = document.getElementById('bulkMessage').value;
+      
+      showToast('✅ Request submitted! We\'ll contact you within 24 hours.');
+      closeBulkOrderModal();
+    }
+
+    function openProfilePreview() {
+      if (!currentUser) return;
+      
+      const profileData = currentUser.data ? JSON.parse(currentUser.data) : {};
+      const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+      
+      const avatarEl = document.getElementById('previewProfileAvatar');
+      const imgEl = document.getElementById('previewProfileImage');
+      
+      avatarEl.textContent = initials;
+      
+      if (profileData.profilePicture) {
+        avatarEl.style.display = 'none';
+        imgEl.src = profileData.profilePicture;
+        imgEl.style.display = 'block';
+      } else {
+        avatarEl.style.display = 'flex';
+        imgEl.style.display = 'none';
+      }
+      
+      document.getElementById('previewProfileName').textContent = currentUser.name;
+      document.getElementById('previewProfileTitle').textContent = profileData.jobTitle || 'Add your job title';
+      document.getElementById('previewProfileEmail').textContent = currentUser.email;
+      document.getElementById('previewProfilePhone').textContent = currentUser.phone;
+      document.getElementById('previewProfileCompany').textContent = profileData.company || 'Add your company';
+      document.getElementById('previewProfileAbout').textContent = profileData.about || 'Tell people about yourself...';
+      document.getElementById('previewProfileURL').textContent = `duobuddy.my/${currentUser.username}`;
+      
+      renderContactActions('previewProfileContactActions', currentUser.phone, profileData.whatsapp);
+      renderSocialLinks('previewProfileSocialLinks', profileData);
+      
+      document.getElementById('profilePreviewModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeProfilePreview() {
+      document.getElementById('profilePreviewModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    function openPublicProfileInNewTab() {
+      if (!currentUser) return;
+      const url = window.location.href.split('#')[0] + '#' + currentUser.username;
+      window.open(url, '_blank');
+    }
+
+    initApp();
+    document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+    document.addEventListener('keydown', function(e){
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); }
+      if (e.key === 'F12') { e.preventDefault(); }
+    });
+  </script>
+</body>
+</html>
