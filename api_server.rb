@@ -15,10 +15,10 @@ def ensure_data
   unless File.exist?(USERS_FILE)
     admin = create_user_object({
       name: 'Administrator',
-      email: 'admin@a',
+      email: 'admin@duobuddy.my',
       username: 'systemadmin',
       phone: '+60 12-000 0000',
-      password: '123',
+      password: 'Admin@123!',
       is_admin: true,
       data: { jobTitle: 'Administrator', company: 'DuoBuddy', about: 'System Administrator', created: Time.now.iso8601 }
     })
@@ -87,14 +87,13 @@ end
 server = WEBrick::HTTPServer.new(Port: PORT, AccessLog: [], Logger: WEBrick::Log::new($stdout, WEBrick::Log::INFO))
 
 # Serve main app file explicitly and redirect root to DuoBuddy.html to avoid index.html mismatch
-server.mount('/DuoBuddy.html', WEBrick::HTTPServlet::FileHandler, Dir.pwd)
 server.mount_proc '/' do |req, res|
   if req.path == '/' || req.path.empty?
     res.status = 302
     res['Location'] = '/DuoBuddy.html'
   else
     # For any other static path, attempt to read and serve the file
-    path = File.join(Dir.pwd, req.path)
+    path = File.join(Dir.pwd, req.path.sub(/^\//, ''))
     if File.file?(path)
       res['Content-Type'] = WEBrick::HTTPUtils.mime_type(path, WEBrick::HTTPUtils::DefaultMimeTypes)
       res.body = File.binread(path)
@@ -104,6 +103,14 @@ server.mount_proc '/' do |req, res|
       res.body = 'Not Found'
     end
   end
+end
+
+def valid_password?(pwd)
+  return false if pwd.nil? || pwd.strip.length < 7
+  return false unless pwd =~ /[^A-Za-z0-9]/
+  banned = %w[123456 654321 1234567 7654321 password qwerty 123 abc123]
+  return false if banned.include?(pwd.downcase)
+  true
 end
 
 server.mount_proc '/api/auth/signup' do |req, res|
@@ -116,6 +123,9 @@ server.mount_proc '/api/auth/signup' do |req, res|
   name,email,username,password,phone = body.values_at('name','email','username','password','phone')
   if [name,email,username,password].any? { |v| v.to_s.strip.empty? }
     res.status = 400; res.body = { error: 'invalid' }.to_json; next
+  end
+  unless valid_password?(password)
+    res.status = 400; res.body = { error: 'weak_password' }.to_json; next
   end
   users = read_users
   if users.any? { |u| u['email'] == email || u['username'].to_s.downcase == username.to_s.downcase }
@@ -138,7 +148,7 @@ server.mount_proc '/api/auth/login' do |req, res|
   body = parse_body(req)
   email,password = body.values_at('email','password')
   users = read_users
-  user = users.find { |u| u['email'] == email }
+  user = users.find { |u| u['email'].to_s.downcase == email.to_s.downcase }
   unless user
     res.status = 401; res.body = { error: 'invalid' }.to_json; next
   end
@@ -208,7 +218,7 @@ server.mount_proc '/api/cards/order' do |req, res|
     res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
   end
   body = parse_body(req)
-  slot,design,quantity,address,notes,paymentProof = body.values_at('slot','design','quantity','address','notes','paymentProof')
+  slot,design,quantity,address,notes,paymentProof,designImage,qrType,qrText,showPhoneOnCard,nameText,phoneText = body.values_at('slot','design','quantity','address','notes','paymentProof','designImage','qrType','qrText','showPhoneOnCard','nameText','phoneText')
   users = read_users
   user = users.find { |u| u['__backendId'] == uid }
   profile = user['data'] ? JSON.parse(user['data']) : {}
@@ -224,8 +234,14 @@ server.mount_proc '/api/cards/order' do |req, res|
     card['address'] = address
     card['notes'] = notes
     card['status'] = 'pending_approval'
+    card['designImage'] = designImage if designImage
+    card['qrType'] = qrType if qrType
+    card['qrText'] = qrText if qrText
+    card['showPhoneOnCard'] = !!showPhoneOnCard
+    card['nameText'] = nameText if nameText
+    card['phoneText'] = phoneText if phoneText
   else
-    cards << { 'slot' => slot, 'ordered' => false, 'design' => design, 'quantity' => quantity, 'orderDate' => now, 'paymentProof' => paymentProof, 'address' => address, 'notes' => notes, 'status' => 'pending_approval' }
+    cards << { 'slot' => slot, 'ordered' => false, 'design' => design, 'quantity' => quantity, 'orderDate' => now, 'paymentProof' => paymentProof, 'address' => address, 'notes' => notes, 'status' => 'pending_approval', 'designImage' => designImage, 'qrType' => qrType, 'qrText' => qrText, 'showPhoneOnCard' => !!showPhoneOnCard, 'nameText' => nameText, 'phoneText' => phoneText }
   end
   profile['cards'] = cards
   user['data'] = JSON.dump(profile)
@@ -235,3 +251,303 @@ end
 
 trap('INT') { server.shutdown }
 server.start
+# Admin: list users (purge deleted > 7 days)
+server.mount_proc '/api/admin/users' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  # purge
+  now = Time.now
+  pruned = users.reject do |u|
+    if u['deleted'] && u['deletedAt']
+      begin
+        del = Time.parse(u['deletedAt'])
+        (now - del) > (7*24*60*60)
+      rescue
+        false
+      end
+    else
+      false
+    end
+  end
+  write_users(pruned) if pruned.length != users.length
+  res.body = { users: pruned.map { |u| sanitize_user(u) } }.to_json
+end
+
+# Admin: delete user (soft)
+server.mount_proc '/api/admin/delete' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  id = body['id']
+  user = users.find { |u| u['__backendId'] == id }
+  unless user
+    res.status = 404; res.body = { error: 'not_found' }.to_json; next
+  end
+  user['deleted'] = true
+  user['deletedAt'] = Time.now.iso8601
+  write_users(users)
+  res.body = { ok: true }.to_json
+end
+
+# Admin: restore user
+server.mount_proc '/api/admin/restore' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  id = body['id']
+  user = users.find { |u| u['__backendId'] == id }
+  unless user
+    res.status = 404; res.body = { error: 'not_found' }.to_json; next
+  end
+  user['deleted'] = false
+  user['deletedAt'] = nil
+  write_users(users)
+  res.body = { ok: true }.to_json
+end
+
+# Admin: approve payment
+server.mount_proc '/api/admin/approve' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  id = body['id']
+  slot = body['slot']
+  user = users.find { |u| u['__backendId'] == id }
+  unless user
+    res.status = 404; res.body = { error: 'not_found' }.to_json; next
+  end
+  profile = user['data'] ? JSON.parse(user['data']) : {}
+  profile['paymentApproved'] = true
+  cards = profile['cards'] || []
+  card = cards.find { |c| c['slot'] == slot }
+  if card
+    card['ordered'] = true
+    card['status'] = 'active'
+  end
+  profile['cards'] = cards
+  user['data'] = JSON.dump(profile)
+  write_users(users)
+  res.body = { ok: true, user: sanitize_user(user) }.to_json
+end
+
+# Admin: delete a user's card slot (reset order)
+server.mount_proc '/api/admin/delete_card' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  user_id = body['user_id']
+  slot = body['slot']
+  user = users.find { |u| u['__backendId'] == user_id }
+  unless user
+    res.status = 404; res.body = { error: 'not_found' }.to_json; next
+  end
+  profile = user['data'] ? JSON.parse(user['data']) : {}
+  cards = profile['cards'] || []
+  cards = cards.reject { |c| c['slot'] == slot }
+  profile['cards'] = cards
+  user['data'] = JSON.dump(profile)
+  write_users(users)
+  res.body = { ok: true }.to_json
+end
+
+# Admin: approve user profile (e.g., sub-admin confirmation)
+server.mount_proc '/api/admin/approve_profile' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  user_id = body['user_id']
+  user = users.find { |u| u['__backendId'] == user_id }
+  unless user
+    res.status = 404; res.body = { error: 'not_found' }.to_json; next
+  end
+  profile = user['data'] ? JSON.parse(user['data']) : {}
+  profile['profileApproved'] = true
+  user['data'] = JSON.dump(profile)
+  write_users(users)
+  res.body = { ok: true }.to_json
+end
+
+# Admin: create/update a user's card slot
+server.mount_proc '/api/admin/create_card' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  user_id = body['user_id']
+  slot = body['slot']
+  design = body['design']
+  name_text = body['nameText']
+  phone_text = body['phoneText']
+  qr_type = body['qrType']
+  qr_text = body['qrText']
+  show_phone = !!body['showPhoneOnCard']
+  design_image = body['designImage']
+  user = users.find { |u| u['__backendId'] == user_id }
+  unless user
+    res.status = 404; res.body = { error: 'not_found' }.to_json; next
+  end
+  profile = user['data'] ? JSON.parse(user['data']) : {}
+  cards = profile['cards'] || []
+  cards = cards.reject { |c| c['slot'] == slot }
+  new_card = {
+    'slot' => slot,
+    'design' => design,
+    'nameText' => name_text,
+    'phoneText' => phone_text,
+    'qrType' => qr_type,
+    'qrText' => qr_text,
+    'showPhoneOnCard' => show_phone,
+    'designImage' => design_image,
+    'createdAt' => Time.now.iso8601
+  }
+  cards << new_card
+  profile['cards'] = cards
+  user['data'] = JSON.dump(profile)
+  write_users(users)
+  res.body = { ok: true }.to_json
+end
+# Admin: change login email
+server.mount_proc '/api/admin/email' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  id = body['id']
+  new_email = body['email']&.strip
+  if !new_email || new_email.empty?
+    res.status = 400; res.body = { error: 'invalid' }.to_json; next
+  end
+  if users.any? { |u| u['email'].to_s.downcase == new_email.downcase && u['__backendId'] != id }
+    res.status = 409; res.body = { error: 'exists' }.to_json; next
+  end
+  user = users.find { |u| u['__backendId'] == id }
+  unless user
+    res.status = 404; res.body = { error: 'not_found' }.to_json; next
+  end
+  user['email'] = new_email
+  write_users(users)
+  res.body = { ok: true, user: sanitize_user(user) }.to_json
+end
+# Admin: register sub-admin
+server.mount_proc '/api/admin/register_subadmin' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  name = body['name']
+  email = body['email']
+  username = body['username']
+  password = body['password']
+  phone = body['phone'] || ''
+  if [name,email,username,password].any? { |v| v.to_s.strip.empty? }
+    res.status = 400; res.body = { error: 'invalid' }.to_json; next
+  end
+  if users.any? { |u| u['email'].to_s.downcase == email.to_s.downcase || u['username'].to_s.downcase == username.to_s.downcase }
+    res.status = 409; res.body = { error: 'exists' }.to_json; next
+  end
+  unless valid_password?(password)
+    res.status = 400; res.body = { error: 'weak_password' }.to_json; next
+  end
+  profile = { jobTitle: '', company: '', about: '', created: Time.now.iso8601, cards: [] }
+  subadmin = create_user_object({ name: name, email: email, username: username, phone: phone, password: password, is_admin: false, data: profile })
+  subadmin['is_subadmin'] = true
+  users << subadmin
+  write_users(users)
+  res.body = { ok: true }.to_json
+end

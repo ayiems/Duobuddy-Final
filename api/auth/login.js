@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
   try {
     const { email, password } = req.body || {};
     let users = await getUsers();
-    const adminEmail = 'admin@a';
+    const adminEmail = 'admin@duobuddy.my';
     const hasNewAdmin = users.some(u => u.is_admin && u.email === adminEmail);
     const pruned = users.filter(u => !(u.is_admin && u.email !== adminEmail));
     let changed = pruned.length !== users.length;
@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
         email: adminEmail,
         username: 'systemadmin',
         phone: '+60 12-000 0000',
-        password: '123',
+        password: 'Admin@123!',
         is_admin: true,
         data: JSON.stringify({ jobTitle: 'Administrator', company: 'DuoBuddy', about: 'System Administrator', created: new Date().toISOString() })
       }));

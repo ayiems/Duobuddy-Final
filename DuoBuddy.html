@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartCard Connect - DuoBuddy</title>
+  <title>Premium Business Card - DuoBuddy</title>
   
   <style>
     :root {
@@ -494,7 +494,7 @@
   <div id="homepage" class="page active">
   <nav class="gradient-bg bg-animate p-4 shadow-lg">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
-     <h1 class="text-white text-3xl font-bold">✨ SmartCard Connect</h1>
+     <h1 class="text-white text-3xl font-bold">✨ Premium Business Card</h1>
      <div class="flex gap-4"><a href="#" class="nav-link" onclick="showPage('login'); return false;">Login</a> <a href="#" class="nav-link" onclick="showPage('signup'); return false;">Sign Up</a>
      </div>
     </div>
@@ -528,7 +528,7 @@
    </section>
    <section class="py-20 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4">
-     <h3 class="text-4xl font-bold text-center mb-16 text-gray-800">Why Choose SmartCard Connect?</h3>
+     <h3 class="text-4xl font-bold text-center mb-16 text-gray-800">Why Choose Premium Business Card?</h3>
      <div class="grid md:grid-cols-3 gap-8">
       <div class="feature-card reveal">
        <div class="feature-icon">
@@ -847,6 +847,11 @@
        <div><label for="editCompany" class="block text-gray-700 mb-2 font-semibold">Company</label> <input type="text" id="editCompany" class="input-field">
        </div>
       </div>
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+       <div><label class="block text-gray-700 mb-2 font-semibold">Registered Login Email</label><input type="email" id="editLoginEmail" class="input-field" disabled></div>
+       <div><label class="block text-gray-700 mb-2 font-semibold">Preferred Email (for preview)</label><input type="email" id="editPreferredEmail" class="input-field" placeholder="preferred@email.com"></div>
+      </div>
+      <div class="mb-6"><label class="inline-flex items-center gap-2 text-gray-700 font-semibold"><input type="checkbox" id="editUseLoginForPreview"> Use login email for preview</label></div>
       <div class="mb-6"><label for="editPhone" class="block text-gray-700 mb-2 font-semibold">Phone Number</label> <input type="tel" id="editPhone" class="input-field" placeholder="+60 12-345 6789">
       </div>
       <div class="mb-6"><label for="editWhatsapp" class="block text-gray-700 mb-2 font-semibold">WhatsApp Number (Optional)</label> <input type="tel" id="editWhatsapp" class="input-field" placeholder="+60 12-345 6789">
@@ -935,7 +940,7 @@
   <div id="public-profile" class="page">
    <nav class="gradient-bg p-4 shadow-lg">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
-     <h1 class="text-white text-3xl font-bold">✨ SmartCard Connect</h1>
+     <h1 class="text-white text-3xl font-bold">✨ Premium Business Card</h1>
      <div class="flex gap-4"><a href="#" class="nav-link" onclick="showPage('homepage'); return false;">Home</a>
      </div>
     </div>
@@ -1012,44 +1017,45 @@
    <nav class="gradient-bg p-4 shadow-lg">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
      <h1 class="text-white text-3xl font-bold">⚙️ Admin Dashboard</h1>
-     <div class="flex gap-4"><button class="btn btn-secondary" onclick="showPage('change-password')">🔒 Change Password</button> <button class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+     <div class="flex gap-4"><button class="btn btn-primary" onclick="showPage('company-management'); renderCompanyList();">🏢 Company Management</button> <button class="btn btn-secondary" onclick="openSubAdminModal()">➕ Register Sub-Admin</button> <button class="btn btn-secondary" onclick="showPage('change-password')">🔒 Change Password</button> <button class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
      </div>
     </div>
    </nav>
    <div class="max-w-7xl mx-auto px-4 py-10"><!-- Stats Dashboard -->
-    <div class="grid md:grid-cols-4 gap-6 mb-10">
-     <div class="stat-card">
+     <div class="grid md:grid-cols-4 gap-6 mb-10">
+     <div class="stat-card" onclick="setFilter('all')" style="cursor:pointer">
       <div class="text-5xl mb-3">
        👥
       </div>
       <p class="text-4xl font-bold mb-2" id="adminTotalUsers">0</p>
       <p class="text-lg opacity-90">Total Users</p>
      </div>
-     <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+     <div class="stat-card" onclick="setFilter('trial')" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); cursor:pointer">
       <div class="text-5xl mb-3">
        🎯
       </div>
       <p class="text-4xl font-bold mb-2" id="adminTrialUsers">0</p>
       <p class="text-lg opacity-90">Trial Users</p>
      </div>
-     <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+     <div class="stat-card" onclick="setFilter('approved')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); cursor:pointer">
       <div class="text-5xl mb-3">
        ✅
       </div>
       <p class="text-4xl font-bold mb-2" id="adminApprovedUsers">0</p>
       <p class="text-lg opacity-90">Approved</p>
      </div>
-     <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+     <div class="stat-card" onclick="setFilter('pending')" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); cursor:pointer">
       <div class="text-5xl mb-3">
        &#9203;
       </div>
       <p class="text-4xl font-bold mb-2" id="adminPendingUsers">0</p>
       <p class="text-lg opacity-90">Pending</p>
      </div>
-    </div><!-- Activity Logs Section -->
-    <div class="card p-8 mb-10">
+    </div><!-- Users Management Section -->
+    <div class="card p-8">
      <div class="flex justify-between items-center mb-6">
-      <h2 class="text-3xl font-bold text-gray-800">📋 Activity Logs</h2><button class="btn btn-primary" onclick="exportActivityLogs()">📥 Export Logs</button>
+      <h2 class="text-3xl font-bold text-gray-800">📋 Activity Logs</h2>
+      <div class="flex gap-3"><button class="btn btn-primary" onclick="exportActivityLogs()">📥 Export Logs</button><button class="btn btn-danger" onclick="clearActivityLogs()">🗑️ Clear Logs</button></div>
      </div>
      <div class="overflow-x-auto" style="max-height: 400px; overflow-y: auto;">
       <table class="table">
@@ -1068,15 +1074,16 @@
        </tbody>
       </table>
      </div>
-    </div><!-- Users Management Section -->
-    <div class="card p-8">
+    </div><!-- Activity Logs Section moved to bottom -->
+    <div class="card p-8 mb-10">
      <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
-      <h2 class="text-3xl font-bold text-gray-800">All Registered Users</h2><button class="btn btn-primary" onclick="exportUsersToCSV()">📥 Export to CSV</button>
+      <h2 class="text-3xl font-bold text-gray-800">All Registered Users</h2>
+      <div class="flex gap-3"><button class="btn btn-primary" onclick="exportUsersToCSV()">📥 Export to CSV</button><button class="btn btn-secondary" onclick="refreshAdminUsers()">🔄 Refresh</button></div>
      </div><!-- Search Bar -->
      <div class="mb-6"><label for="adminSearchInput" class="block text-gray-700 mb-2 font-semibold">🔍 Search Users</label> <input type="text" id="adminSearchInput" class="input-field" placeholder="Search by name, email, or username..." oninput="filterUsers()">
      </div><!-- Filter Buttons -->
      <div class="mb-8"><label class="block text-gray-700 mb-3 font-semibold">🎯 Filter by Status</label>
-      <div class="flex flex-wrap gap-3"><button class="filter-btn active" data-filter="all" onclick="setFilter('all')"> All Users <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countAll">0</span> </button> <button class="filter-btn" data-filter="trial" onclick="setFilter('trial')"> Trial <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countTrial">0</span> </button> <button class="filter-btn" data-filter="pending" onclick="setFilter('pending')"> Pending Payment <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countPending">0</span> </button> <button class="filter-btn" data-filter="approved" onclick="setFilter('approved')"> Approved <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countApproved">0</span> </button> <button class="filter-btn" data-filter="expired" onclick="setFilter('expired')"> Expired <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countExpired">0</span> </button> <button class="filter-btn" data-filter="deleted" onclick="setFilter('deleted')"> Deleted <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countDeleted">0</span> </button>
+      <div class="flex flex-wrap gap-3"><button class="filter-btn active" data-filter="all" onclick="setFilter('all')"> All Users <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countAll">0</span> </button> <button class="filter-btn" data-filter="trial" onclick="setFilter('trial')"> Trial <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countTrial">0</span> </button> <button class="filter-btn" data-filter="pending" onclick="setFilter('pending')"> Pending Payment <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countPending">0</span> </button> <button class="filter-btn" data-filter="approved" onclick="setFilter('approved')"> Approved <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countApproved">0</span> </button> <button class="filter-btn" data-filter="expired" onclick="setFilter('expired')"> Expired <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countExpired">0</span> </button> <button class="filter-btn" data-filter="deleted" onclick="setFilter('deleted')"> Deleted <span class="ml-2 px-2 py-1 bg-white bg-opacity-30 rounded-full text-sm" id="countDeleted">0</span> </button> <button class="filter-btn" data-filter="subadmin" onclick="setFilter('subadmin')"> Sub‑Admins </button>
       </div>
      </div>
      <div class="overflow-x-auto">
@@ -1100,8 +1107,80 @@
       </table>
      </div>
     </div>
+  </div>
+  <div id="company-management" class="page">
+   <nav class="gradient-bg p-4 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+     <h1 class="text-white text-3xl font-bold">🏢 Company Management</h1>
+     <div class="flex gap-4"><button class="btn btn-primary" onclick="showBulkOrderModal()">📦 Request Bulk Order</button> <button class="btn btn-secondary" onclick="showPage('admin');">⬅️ Back to Admin</button></div>
+    </div>
+   </nav>
+   <div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="card p-8 mb-6">
+     <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+      <h2 class="text-3xl font-bold text-gray-800">Companies</h2>
+      <div class="flex gap-3"><button class="btn btn-secondary" onclick="renderCompanyList()">🔄 Refresh</button></div>
+     </div>
+     <div id="companyList" class="grid md:grid-cols-3 gap-6"></div>
+    </div>
    </div>
-  </div><!-- Admin User Management Modal -->
+  </div>
+  <div id="company-detail" class="page">
+   <nav class="gradient-bg p-4 shadow-lg">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+     <h1 class="text-white text-3xl font-bold" id="companyDetailTitle">🏢 Company</h1>
+     <div class="flex gap-4"><button class="btn btn-primary" onclick="showBulkOrderModal()">📦 Request Bulk Order</button> <button class="btn btn-secondary" onclick="showPage('company-management');">⬅️ Back to Companies</button></div>
+    </div>
+   </nav>
+   <div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="card p-8 mb-6">
+     <h2 class="text-2xl font-bold text-gray-800 mb-4">Employees</h2>
+     <div id="companyEmployees" class="overflow-x-auto">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Name</th>
+         <th>Email</th>
+         <th>Username</th>
+         <th>Status</th>
+         <th>Actions</th>
+        </tr>
+       </thead>
+       <tbody id="companyEmployeesTable">
+        <tr><td colspan="5" class="text-center text-gray-500 py-10">No employees found</td></tr>
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div><!-- Admin User Management Modal -->
+
+  <div id="subAdminModal" style="display: none;">
+   <div class="modal-overlay" onclick="closeSubAdminModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+     <div class="p-10">
+      <div class="text-center mb-8">
+       <div class="text-6xl mb-4">👥</div>
+       <h3 class="text-4xl font-bold text-gray-800 mb-2">Register Sub-Admin</h3>
+      </div>
+      <form id="subAdminForm" onsubmit="handleRegisterSubAdmin(event)">
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <div><label class="block text-gray-700 mb-2 font-semibold">Full Name</label><input type="text" id="subAdminName" class="input-field" required></div>
+          <div><label class="block text-gray-700 mb-2 font-semibold">Username</label><input type="text" id="subAdminUsername" class="input-field" required></div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <div><label class="block text-gray-700 mb-2 font-semibold">Email</label><input type="email" id="subAdminEmail" class="input-field" required></div>
+          <div><label class="block text-gray-700 mb-2 font-semibold">Phone</label><input type="text" id="subAdminPhone" class="input-field" placeholder="+60 12-345 6789"></div>
+        </div>
+        <div class="mb-6"><label class="block text-gray-700 mb-2 font-semibold">Password</label><input type="password" id="subAdminPassword" class="input-field" required minlength="7"></div>
+        <button type="submit" class="btn btn-primary w-full">✅ Create Sub-Admin</button>
+      </form>
+      <div class="mt-4 text-center"><button class="btn btn-secondary" onclick="closeSubAdminModal()">Close</button></div>
+     </div>
+    </div>
+   </div>
+  </div>
   <div id="adminUserModal" style="display: none;">
    <div class="modal-overlay" onclick="closeAdminUserModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
@@ -1118,10 +1197,33 @@
        <div class="text-center"><img id="adminPaymentProofImage" src="" alt="Payment Proof" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-bottom: 16px;" onerror="this.style.display='none';">
         <p id="adminNoPaymentProof" class="text-gray-600">No payment proof uploaded</p>
        </div>
+      </div>
+      <div class="card p-8 mb-6 bg-gradient-to-r from-indigo-50 to-cyan-50" id="adminBackQrSection" style="display: none;">
+        <h4 class="text-2xl font-bold text-gray-800 mb-4">🔗 Back QR Selection</h4>
+        <p class="text-gray-700 mb-2" id="adminBackQrInfo"></p>
+        <div class="text-center">
+          <img id="adminBackQrImage" src="" alt="Back QR" style="max-width: 220px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-bottom: 16px; display:none;">
+          <a id="adminBackQrLink" href="#" target="_blank" class="btn btn-secondary" style="display:none;">Open QR Link</a>
+        </div>
+      </div>
+      <div class="card p-8 mb-6 bg-gradient-to-r from-gray-50 to-slate-100" id="adminAssetsSection" style="display: none;">
+        <h4 class="text-2xl font-bold text-gray-800 mb-4">📁 User Card Assets</h4>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-gray-700 mb-2">Design Image</p>
+            <img id="adminDesignImagePreview" src="" alt="Design" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-bottom: 8px; display:none;">
+            <a id="adminDesignImageDownload" href="#" download="design.png" class="btn btn-secondary" style="display:none;">Download Design</a>
+          </div>
+          <div>
+            <p class="text-gray-700 mb-2">Payment Proof</p>
+            <a id="adminPaymentProofDownload" href="#" download="payment_proof.png" class="btn btn-secondary" style="display:none;">Download Payment Proof</a>
+          </div>
+        </div>
       </div><!-- Approve Payment Section -->
       <div class="card p-8 mb-6 bg-gradient-to-r from-green-50 to-emerald-50">
-       <h4 class="text-2xl font-bold text-gray-800 mb-4">💳 Approve Payment &amp; Upload Card Details</h4>
-       <form id="approvePaymentForm" onsubmit="handleApprovePayment(event)">
+        <h4 class="text-2xl font-bold text-gray-800 mb-4">💳 Approve Payment &amp; Upload Card Details</h4>
+        <form id="approvePaymentForm" onsubmit="handleApprovePayment(event)">
+        <p id="adminCardCountText" class="text-sm text-gray-600 mb-2"></p>
         <div class="mb-4"><label for="approveCardSlot" class="block text-gray-700 mb-2 font-semibold">Card Slot Number *</label> <input type="number" id="approveCardSlot" class="input-field" min="1" max="10" placeholder="Enter slot number (1-10)" required>
         </div>
         <div class="mb-4"><label for="adminCardDesignUpload" class="block text-gray-700 mb-2 font-semibold">Upload Card Design Image</label>
@@ -1135,8 +1237,24 @@
         </div>
         <div class="mb-4"><label for="adminNfcPassword" class="block text-gray-700 mb-2 font-semibold">NFC Lock Password</label> <input type="text" id="adminNfcPassword" class="input-field" placeholder="Enter NFC lock password">
         </div><button type="submit" class="btn btn-primary w-full">✅ Approve &amp; Activate Card</button>
-       </form>
+        </form>
+        <div class="mt-4">
+          <button class="btn btn-danger w-full" onclick="handleAdminDeleteCard()">🗑️ Delete Card Slot (Reset Order)</button>
+        </div>
       </div><!-- Reset Password Section -->
+      <div class="card p-8 mb-6 bg-gradient-to-r from-yellow-50 to-amber-50" id="subAdminApprovalSection" style="display:none;">
+        <h4 class="text-2xl font-bold text-gray-800 mb-4">👥 Sub-Admin Profile Approval</h4>
+        <p class="text-gray-700 mb-4">Approve this sub-admin's profile to activate their access.</p>
+        <button class="btn btn-primary w-full" onclick="handleApproveSubAdminProfile()">✅ Approve Profile</button>
+      </div>
+      <div class="card p-8 mb-6 bg-gradient-to-r from-yellow-50 to-amber-50">
+       <h4 class="text-2xl font-bold text-gray-800 mb-4">✉️ Change Login Email</h4>
+       <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div><label class="block text-gray-700 mb-2 font-semibold">Current</label><input type="text" id="adminCurrentEmail" class="input-field" disabled></div>
+        <div><label class="block text-gray-700 mb-2 font-semibold">New Email</label><input type="email" id="adminNewEmail" class="input-field" placeholder="user@example.com"></div>
+       </div>
+       <button class="btn btn-primary w-full" onclick="handleAdminChangeEmail()">🔄 Update Login Email</button>
+      </div>
       <div class="card p-8 mb-6 bg-gradient-to-r from-blue-50 to-indigo-50">
        <h4 class="text-2xl font-bold text-gray-800 mb-4">🔑 Reset Password</h4>
        <form id="adminResetPasswordForm" onsubmit="handleAdminResetPassword(event)">
@@ -1144,8 +1262,8 @@
         </div><button type="submit" class="btn btn-primary w-full">🔐 Reset Password</button>
        </form>
       </div><!-- Delete User Section -->
-      <div class="card p-8 bg-gradient-to-r from-red-50 to-pink-50">
-       <h4 class="text-2xl font-bold text-gray-800 mb-4">🗑️ Delete User Account</h4>
+      <div class="card p-8 bg-gradient-to-r from-red-50 to-pink-50" id="adminDeleteUserSection">
+        <h4 class="text-2xl font-bold text-gray-800 mb-4">🗑️ Delete User Account</h4>
        <p class="text-gray-600 mb-4">This action cannot be undone. All user data will be permanently deleted.</p>
        <div id="deleteUserConfirm"><button class="btn btn-danger w-full" onclick="showDeleteConfirmation()">⚠️ Delete User Account</button>
        </div>
@@ -1154,6 +1272,26 @@
         <div class="flex gap-4"><button class="btn btn-danger flex-1" onclick="handleDeleteUser()">✅ Yes, Delete</button> <button class="btn btn-secondary flex-1" onclick="hideDeleteConfirmation()">❌ Cancel</button>
         </div>
        </div>
+      </div>
+      <div class="card p-8 mb-6 bg-gradient-to-r from-sky-50 to-teal-50" id="adminCreateCardSection">
+        <h4 class="text-2xl font-bold text-gray-800 mb-4">📇 Create Business Card For User</h4>
+        <form id="adminCreateCardForm" onsubmit="handleAdminCreateCard(event)">
+          <div class="grid md:grid-cols-3 gap-4 mb-4">
+            <div><label class="block text-gray-700 mb-2 font-semibold">Slot</label><input type="number" id="adminCreateSlot" class="input-field" min="1" max="10" value="1" required></div>
+            <div><label class="block text-gray-700 mb-2 font-semibold">Design</label><select id="adminCreateDesign" class="input-field"><option>Black Matte Card</option><option>Gold Brushed Card</option><option>Silver Brushed Card</option></select></div>
+            <div><label class="block text-gray-700 mb-2 font-semibold">Show Phone on Card</label><input type="checkbox" id="adminCreateShowPhone" class="input-field"></div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <div><label class="block text-gray-700 mb-2 font-semibold">Name</label><input type="text" id="adminCreateName" class="input-field" required></div>
+            <div><label class="block text-gray-700 mb-2 font-semibold">Phone</label><input type="text" id="adminCreatePhone" class="input-field" required></div>
+          </div>
+          <div class="grid md:grid-cols-3 gap-4 mb-4">
+            <div><label class="block text-gray-700 mb-2 font-semibold">QR Type</label><select id="adminCreateQrType" class="input-field"><option value="none">None</option><option value="whatsapp">WhatsApp</option><option value="profile">Profile Link</option><option value="custom">Custom URL</option></select></div>
+            <div class="md:col-span-2"><label class="block text-gray-700 mb-2 font-semibold">QR Text (auto for WhatsApp/Profile)</label><input type="text" id="adminCreateQrText" class="input-field" placeholder="https://..." /></div>
+          </div>
+          <div class="mb-4"><label class="block text-gray-700 mb-2 font-semibold">Design Image (optional)</label><input type="file" id="adminCreateDesignImage" accept="image/*" class="input-field"></div>
+          <button type="submit" class="btn btn-primary w-full">✅ Create Card</button>
+        </form>
       </div>
       <div class="mt-8 text-center"><button class="btn btn-secondary text-lg px-8" onclick="closeAdminUserModal()">Close</button>
       </div>
@@ -1175,15 +1313,142 @@
             <div class="mb-6">
               <label for="orderDesign" class="block text-gray-700 mb-2 font-semibold">Card Design *</label>
               <select id="orderDesign" class="input-field" required onchange="updateCardDesignPreview()">
-                <option value="Classic Black">Classic Black - Professional matte finish</option>
-                <option value="Premium White">Premium White - Clean modern look</option>
-                <option value="Metallic Silver">Metallic Silver - Sleek metallic finish</option>
-                <option value="Gold Edition">Gold Edition - Luxury gold accent</option>
-                <option value="Custom Design">Custom Design - Contact us for details</option>
+                <option value="Black Matte Card">Black Matte Card</option>
+                <option value="Gold Brushed Card">Gold Brushed Card</option>
+                <option value="Silver Brushed Card">Silver Brushed Card</option>
               </select>
-              <div class="mt-4 text-center">
-                <img id="cardDesignPreview" src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&amp;h=250&amp;fit=crop&amp;q=80" alt="Card Preview" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);" onerror="this.style.display='none';">
+        <div class="mt-4">
+          <div class="text-sm text-gray-600 mb-2">Design Editor • Drag name, phone, logo, QR on canvas</div>
+          <div class="mb-3 text-xs text-gray-600">Reminder: Card will be engraved according to card internal colour.</div>
+          <div>
+            <h4 class="font-bold text-xl text-gray-800 mb-2">Front Card</h4>
+            <div class="grid md:grid-cols-2 gap-4 items-start">
+              <div>
+                <p class="text-sm text-gray-500 mb-1">(Preview)</p>
+                <canvas id="cardDesignCanvas" width="430" height="270" style="width:100%; max-width:430px; height:auto; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.15); background:#eee"></canvas>
+                <label class="inline-flex items-center gap-2 mt-2 text-gray-700"><input type="checkbox" id="frontShowGrid"> Show grid</label>
               </div>
+              <div>
+                <p class="text-sm text-gray-500 mb-1">(Doodle Preview)</p>
+                <canvas id="frontDoodlePreviewCanvas" width="430" height="270" style="width:100%; max-width:430px; height:auto; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.15); background:#fafafa"></canvas>
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Name Text</label>
+                <input id="frontDesignName" class="input-field" placeholder="Your Name" />
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div><label class="text-xs text-gray-600">Font</label><select id="frontNameFont" class="input-field"><option>Arial</option><option>Georgia</option><option>Helvetica</option><option>Times New Roman</option></select></div>
+                  <div><label class="text-xs text-gray-600">Size</label><input type="number" id="frontNameSize" class="input-field" min="12" max="60" step="1" value="24" /></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div><label class="text-xs text-gray-600">Pos X</label><input type="number" id="frontNameX" class="input-field" min="0" max="430" step="1" value="215" /></div>
+                  <div><label class="text-xs text-gray-600">Pos Y</label><input type="number" id="frontNameY" class="input-field" min="0" max="270" step="1" value="165" /></div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Resignation (optional)</label>
+                <input id="frontResignation" class="input-field" placeholder="e.g. Senior Engineer" />
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div><label class="text-xs text-gray-600">Font</label><select id="frontResignFont" class="input-field"><option>Arial</option><option>Georgia</option><option>Helvetica</option><option>Times New Roman</option></select></div>
+                  <div><label class="text-xs text-gray-600">Size</label><input type="number" id="frontResignSize" class="input-field" min="10" max="40" step="1" value="14" /></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div><label class="text-xs text-gray-600">Pos X</label><input type="number" id="frontResignX" class="input-field" min="0" max="430" step="1" value="215" /></div>
+                  <div><label class="text-xs text-gray-600">Pos Y</label><input type="number" id="frontResignY" class="input-field" min="0" max="270" step="1" value="195" /></div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Company (optional)</label>
+                <input id="frontCompany" class="input-field" placeholder="e.g. Company Name" />
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div><label class="text-xs text-gray-600">Font</label><select id="frontCompanyFont" class="input-field"><option>Arial</option><option>Georgia</option><option>Helvetica</option><option>Times New Roman</option></select></div>
+                  <div><label class="text-xs text-gray-600">Size</label><input type="number" id="frontCompanySize" class="input-field" min="10" max="40" step="1" value="16" /></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div><label class="text-xs text-gray-600">Pos X</label><input type="number" id="frontCompanyX" class="input-field" min="0" max="430" step="1" value="215" /></div>
+                  <div><label class="text-xs text-gray-600">Pos Y</label><input type="number" id="frontCompanyY" class="input-field" min="0" max="270" step="1" value="140" /></div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Phone Number</label>
+                <input id="frontPhone" class="input-field" placeholder="0123456789" />
+                <div class="flex items-center gap-3 mt-2">
+                  <label class="inline-flex items-center gap-2 text-gray-700"><input type="checkbox" id="frontPhoneShow" checked> Show on card</label>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div><label class="text-xs text-gray-600">Font</label><select id="frontPhoneFont" class="input-field"><option>Arial</option><option>Georgia</option><option>Helvetica</option><option>Times New Roman</option></select></div>
+                  <div><label class="text-xs text-gray-600">Size</label><input type="number" id="frontPhoneSize" class="input-field" min="12" max="50" step="1" value="18" /></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <div><label class="text-xs text-gray-600">Pos X</label><input type="number" id="frontPhoneX" class="input-field" min="0" max="430" step="1" value="215" /></div>
+                  <div><label class="text-xs text-gray-600">Pos Y</label><input type="number" id="frontPhoneY" class="input-field" min="0" max="270" step="1" value="220" /></div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Font</label>
+                <select id="frontDesignFont" class="input-field">
+                  <option value="Arial">Arial</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Helvetica">Helvetica</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Logo</label>
+                <input type="file" id="frontDesignLogoUpload" accept="image/*" class="input-field" onchange="handleDesignLogoUpload(event)" />
+                <button type="button" class="btn btn-secondary mt-2" id="removeLogoBtn" onclick="removeFrontLogo()" style="display:none;">🗑️ Remove Logo</button>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Logo Zoom</label>
+                <input type="range" id="frontLogoScale" min="0.1" max="2" step="0.05" value="1" />
+              </div>
+              <div>
+                <label class="inline-flex items-center gap-2 text-gray-700 font-semibold"><input type="checkbox" id="frontRemoveBg" /> Remove white background</label>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Doodle Border</label>
+                <input type="file" id="frontDoodleUpload" accept="image/*" class="input-field" />
+                <button type="button" class="btn btn-secondary mt-2" id="removeDoodleBtn" onclick="removeFrontDoodle()" style="display:none;">🗑️ Remove Doodle</button>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">Border Width</label>
+                <input type="range" id="frontDoodleWidth" min="6" max="40" step="1" value="16" />
+              </div>
+            </div>
+            <div class="mt-4 text-center">
+              <button type="button" class="btn btn-secondary" onclick="saveFrontDesignImage()">💾 Save Front Preview</button>
+              <input type="hidden" id="orderDesignImageData" />
+            </div>
+          </div>
+          <div class="mt-8">
+            <h4 class="font-bold text-xl text-gray-800 mb-2">Back Card</h4>
+            <p class="text-sm text-gray-500 mb-1">(Preview)</p>
+            <canvas id="cardDesignCanvasBack" width="430" height="270" style="width:100%; max-width:430px; height:auto; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.15); background:#eee"></canvas>
+            <label class="inline-flex items-center gap-2 mt-2 text-gray-700"><input type="checkbox" id="backShowGrid"> Show grid</label>
+            <div class="grid md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">QR Code</label>
+                <select id="backQrType" class="input-field">
+                  <option value="none">None</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="profile">Profile Preview</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">QR Size</label>
+                <input type="range" id="backQrSize" min="60" max="160" step="2" value="90" />
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-1 font-semibold">QR Margin</label>
+                <input type="range" id="backQrMargin" min="0" max="40" step="1" value="10" />
+              </div>
+            </div>
+            <div class="mt-4 text-center">
+              <button type="button" class="btn btn-secondary" onclick="saveBackDesignImage()">💾 Save Back Preview</button>
+            </div>
+          </div>
+        </div>
             </div>
             <div class="mb-6">
               <label for="orderQuantity" class="block text-gray-700 mb-2 font-semibold">Quantity *</label>
@@ -1193,6 +1458,16 @@
                 <option value="3">3 Cards - RM 297</option>
                 <option value="5">5 Cards - RM 495</option>
               </select>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label for="orderPostcode" class="block text-gray-700 mb-2 font-semibold">Postcode (Malaysia)</label>
+                <input type="text" id="orderPostcode" class="input-field" placeholder="e.g. 47500" maxlength="5" pattern="[0-9]{5}">
+              </div>
+              <div>
+                <label for="orderRegion" class="block text-gray-700 mb-2 font-semibold">Region</label>
+                <input type="text" id="orderRegion" class="input-field" placeholder="Auto from postcode" readonly>
+              </div>
             </div>
             <div class="mb-6">
               <label for="orderAddress" class="block text-gray-700 mb-2 font-semibold">Shipping Address *</label>
@@ -1373,6 +1648,7 @@
     let activityLogs = [];
     let currentUser = null;
     let isAdmin = false;
+    let isSubAdmin = false;
     let usernameValidationTimeout = null;
     let currentFilter = 'all';
     let currentSearch = '';
@@ -1446,13 +1722,8 @@
     const dataHandler = {
       onDataChanged(data) {
         allUsers = data.filter(d => d.type !== 'activity_log');
-        activityLogs = data.filter(d => d.type === 'activity_log').sort((a, b) => 
-          new Date(b.timestamp) - new Date(a.timestamp)
-        );
-        
-        updateAdminDashboard();
-        updateActivityLogs();
-        filterUsers();
+        activityLogs = data.filter(d => d.type === 'activity_log').sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        updateAdminDashboard(); updateActivityLogs(); filterUsers();
         
         if (currentUser) {
           const updated = allUsers.find(u => u.__backendId === currentUser.__backendId);
@@ -1501,8 +1772,8 @@
         };
 
         const admin = {
-          email: 'admin@a',
-          password: '123',
+          email: 'admin@duobuddy.my',
+          password: 'Admin@123!',
           name: 'Administrator',
           username: 'systemadmin',
           phone: '+60 12-000 0000',
@@ -1669,17 +1940,20 @@
         entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
       }, { threshold: 0.15 }) : null;
       document.querySelectorAll('.reveal').forEach((el) => { if (observer) { observer.observe(el); } else { el.classList.add('visible'); } });
-      try { const r = await apiRequest('/api/users/me', { method: 'GET' }); if (r.ok) { const me = await r.json(); if (me && me.user) { currentUser = me.user; isAdmin = !!me.user.is_admin; } } } catch(e) {}
+      try { const r = await apiRequest('/api/users/me', { method: 'GET' }); if (r.ok) { const me = await r.json(); if (me && me.user) { currentUser = me.user; isAdmin = !!me.user.is_admin; if (isAdmin) { await refreshAdminUsers(); if(!window.__adminPoll){ window.__adminPoll = setInterval(()=>{ const adminPage = document.getElementById('adminToolsPage') || document.getElementById('adminPage'); const isVisible = adminPage && adminPage.classList.contains('active'); if(isVisible) refreshAdminUsers(); }, 10000); } } } } } catch(e) {}
     }
 
     function showPage(pageId, username = null) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
+      const el = document.getElementById(pageId);
+      if (!el) { const home = document.getElementById('homepage'); if (home) home.classList.add('active'); return; }
+      el.classList.add('active');
       window.scrollTo(0, 0);
       
       if (pageId === 'edit-profile') loadEditProfileForm();
       if (pageId === 'my-cards') renderCardSlots();
       if (pageId === 'public-profile' && username) loadPublicProfile(username);
+      if (pageId === 'company-management') renderCompanyList();
     }
 
     async function loadPublicProfile(username) {
@@ -1699,8 +1973,9 @@
         if (profileData.profilePicture) { avatarEl.style.display = 'none'; imgEl.src = profileData.profilePicture; imgEl.style.display = 'block'; } else { avatarEl.style.display = 'flex'; imgEl.style.display = 'none'; }
         document.getElementById('publicProfileName').textContent = user.name;
         document.getElementById('publicProfileTitle').textContent = profileData.jobTitle || '';
-        const emailEl = document.getElementById('publicProfileEmail');
-        emailEl.textContent = user.email; emailEl.href = `mailto:${user.email}`;
+      const emailEl = document.getElementById('publicProfileEmail');
+        const preferredEmail = profileData.useLoginForPreview ? user.email : (profileData.preferredEmail || user.email);
+        emailEl.textContent = preferredEmail; emailEl.href = `mailto:${preferredEmail}`;
         const phoneEl = document.getElementById('publicProfilePhone');
         phoneEl.textContent = user.phone; phoneEl.href = `tel:${user.phone}`;
         document.getElementById('publicProfileCompany').textContent = profileData.company || 'N/A';
@@ -1717,7 +1992,7 @@
         const vcard = `BEGIN:VCARD
 VERSION:3.0
 FN:${user.name}
-EMAIL:${user.email}
+EMAIL:${preferredEmail}
 TEL:${user.phone}
 ORG:${profileData.company || ''}
 TITLE:${profileData.jobTitle || ''}
@@ -1737,20 +2012,28 @@ END:VCARD`;
     }
 
     window.addEventListener('load', () => {
-      const path = window.location.hash.substring(1);
-      if (path && path !== 'homepage' && path !== '') {
-        setTimeout(() => {
-          const username = path;
-          showPage('public-profile', username);
-        }, 1000);
+      const hash = window.location.hash.substring(1);
+      if (hash && hash !== 'homepage' && hash !== '') {
+        if (hash.startsWith('company=')) {
+          const companyName = decodeURIComponent(hash.split('=')[1] || '');
+          if (companyName) { renderCompanyDetail(companyName); showPage('company-detail'); }
+        } else {
+          const username = hash;
+          setTimeout(() => { showPage('public-profile', username); }, 1000);
+        }
       }
     });
     
     window.addEventListener('hashchange', () => {
-      const path = window.location.hash.substring(1);
-      if (path && path !== 'homepage' && path !== '') {
-        const username = path;
-        showPage('public-profile', username);
+      const hash = window.location.hash.substring(1);
+      if (hash && hash !== 'homepage' && hash !== '') {
+        if (hash.startsWith('company=')) {
+          const companyName = decodeURIComponent(hash.split('=')[1] || '');
+          if (companyName) { renderCompanyDetail(companyName); showPage('company-detail'); }
+        } else {
+          const username = hash;
+          showPage('public-profile', username);
+        }
       }
     });
 
@@ -1780,6 +2063,10 @@ END:VCARD`;
         showToast('Username is reserved', 'error');
         return;
       }
+      if (!isStrongPassword(password)) {
+        showToast('Password too weak: 7+ chars, include special symbol, avoid common patterns', 'error');
+        return;
+      }
       
       document.getElementById('signupBtnText').style.display = 'none';
       document.getElementById('signupBtnLoading').style.display = 'inline';
@@ -1805,6 +2092,13 @@ END:VCARD`;
       }
     }
 
+    function isStrongPassword(pwd){
+      if (!pwd || pwd.trim().length < 7) return false;
+      if (!/[^A-Za-z0-9]/.test(pwd)) return false;
+      const banned = ['123456','654321','1234567','7654321','password','qwerty','123','abc123'];
+      return !banned.includes(pwd.toLowerCase());
+    }
+
     async function handleLogin(event) {
       event.preventDefault();
       
@@ -1824,9 +2118,10 @@ END:VCARD`;
           const user = data.user;
           currentUser = user;
           isAdmin = user.is_admin || false;
+          isSubAdmin = user.is_subadmin || false;
           showToast(`🎉 Welcome back, ${user.name}!`);
           document.getElementById('loginForm').reset();
-          if (isAdmin) { setTimeout(() => showPage('admin'), 1000); } else { loadUserProfile(user); setTimeout(() => showPage('my-cards'), 1000); }
+          if (isAdmin || isSubAdmin) { setTimeout(() => { showPage('admin'); repositionActivityLogs(); }, 1000); } else { loadUserProfile(user); setTimeout(() => showPage('my-cards'), 1000); }
         } else {
           showToast('Invalid email or password', 'error');
         }
@@ -1892,7 +2187,14 @@ END:VCARD`;
       const container = document.getElementById('cardSlotsContainer');
       container.innerHTML = '';
       
-      for (let i = 1; i <= 10; i++) {
+      const activeCount = cards.filter(c => c.ordered).length;
+      const totalOwnedText = document.createElement('div');
+      totalOwnedText.className = 'text-center text-sm text-gray-600 mb-6';
+      totalOwnedText.textContent = `Owned: ${activeCount}/10`;
+      const parentCard = document.querySelector('#my-cards .card');
+      if (parentCard && !document.getElementById('ownedCounterInserted')) { totalOwnedText.id = 'ownedCounterInserted'; parentCard.insertBefore(totalOwnedText, container); }
+      const displaySlots = Math.min(10, activeCount + 1);
+      for (let i = 1; i <= displaySlots; i++) {
         const card = cards.find(c => c.slot === i);
         const isActive = card && card.ordered;
         
@@ -1935,6 +2237,7 @@ END:VCARD`;
       
       // Reset form and preview
       document.getElementById('orderCardForm').reset();
+      drawDoodlePreviewCanvas();
       document.getElementById('paymentProofPreview').style.display = 'none';
       document.getElementById('paymentProofPreview').src = '';
       document.getElementById('removePaymentProofBtn').style.display = 'none';
@@ -1956,12 +2259,465 @@ END:VCARD`;
     }
     
     function updateCardDesignPreview() {
-      const design = document.getElementById('orderDesign').value;
-      const previewImg = document.getElementById('cardDesignPreview');
-      
-      // Hide image preview since external images are blocked
-      previewImg.style.display = 'none';
+      redrawCardDesign();
     }
+
+    let designDoodleImg = null; let designDoodleWidth = 16;
+    let frontNameSize = 24; let frontPhoneSize = 18; let frontResignSize = 14; let frontCompanySize = 16;
+    let frontNameFont = 'Arial'; let frontPhoneFont = 'Arial'; let frontResignFont = 'Arial'; let frontCompanyFont = 'Arial';
+    let frontPhoneShow = true;
+    let backQrSize = 90; let backQrMargin = 10;
+    const designState = { side: 'front', name: '', font: 'Arial', logo: null, logoScale: 1, namePos: {x: 215, y: 165}, phone: '', phonePos: {x: 215, y: 220}, resignation: '', resignPos: {x: 215, y: 195}, company: '', companyPos: {x: 215, y: 140}, qrType: 'none', qrImg: null, qrPos: {x: 340, y: 180}, activeTool: 'move_name' };
+    const designBack = { name: '', font: 'Arial', logo: null, logoScale: 1, namePos: {x: 215, y: 175}, phone: '', phonePos: {x: 215, y: 205}, resignation: '', resignPos: {x: 215, y: 195}, company: '', companyPos: {x: 215, y: 140}, qrType: 'none', qrImg: null, qrPos: {x: 140, y: 180} };
+
+    function redrawCardDesign() {
+      const canvas = document.getElementById('cardDesignCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const design = document.getElementById('orderDesign').value;
+      designState.side = document.getElementById('designSide').value;
+      designState.name = document.getElementById('designName').value || '';
+      designState.font = document.getElementById('designFont').value || 'Arial';
+      designState.logoScale = parseFloat(document.getElementById('designLogoScale').value || '1');
+      const removeBg = document.getElementById('designRemoveBg').checked;
+      
+      // Background
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      if (design === 'Black Matte Card') {
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+      } else if (design === 'Gold Brushed Card') {
+        const grd = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+        grd.addColorStop(0,'#b58900'); grd.addColorStop(1,'#d9a441');
+        ctx.fillStyle = grd; ctx.fillRect(0,0,canvas.width,canvas.height);
+      } else {
+        const grd = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+        grd.addColorStop(0,'#9CA3AF'); grd.addColorStop(1,'#D1D5DB');
+        ctx.fillStyle = grd; ctx.fillRect(0,0,canvas.width,canvas.height);
+      }
+
+      if (designDoodleImg) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0,0,canvas.width,canvas.height);
+        ctx.rect(designDoodleWidth, designDoodleWidth, canvas.width - designDoodleWidth*2, canvas.height - designDoodleWidth*2);
+        ctx.clip('evenodd');
+        ctx.drawImage(designDoodleImg, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+      
+      // No-edit zone on back (right half)
+      if (designState.side === 'back') {
+        ctx.fillStyle = 'rgba(0,0,0,0.08)';
+        ctx.fillRect(canvas.width/2, 0, canvas.width/2, canvas.height);
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '12px Arial';
+        ctx.fillText('NO EDIT', canvas.width*0.75-30, 20);
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(canvas.width*0.75, canvas.height*0.5, 30, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(canvas.width*0.75-20, canvas.height*0.5-20);
+        ctx.lineTo(canvas.width*0.75+20, canvas.height*0.5+20);
+        ctx.stroke();
+      }
+      
+      // Draw name text
+      ctx.fillStyle = design === 'Black Matte Card' ? '#ffffff' : '#111827';
+      ctx.font = `24px ${designState.font}`;
+      ctx.textAlign = 'center'; ctx.fillText(designState.name || '', designState.namePos.x, designState.namePos.y);
+
+      // Phone text
+      ctx.font = `18px ${designState.font}`;
+      ctx.fillText(designState.phone || '', designState.phonePos.x, designState.phonePos.y);
+      
+      // Draw logo if loaded
+      if (designState.logo) {
+        const img = designState.logo;
+        const targetW = 120 * designState.logoScale;
+        const targetH = (img.height/img.width) * targetW;
+        let dx = (designState.logoPos ? designState.logoPos.x : canvas.width*0.5) - targetW/2;
+        let dy = (designState.logoPos ? designState.logoPos.y : canvas.height*0.25) - targetH/2;
+        // If back side, ensure logo stays on left half
+        if (designState.side === 'back' && dx + targetW > canvas.width/2) dx = canvas.width/2 - targetW - 10;
+        if (removeBg) {
+          // Simple white background removal via offscreen canvas threshold
+          const off = document.createElement('canvas'); off.width = img.width; off.height = img.height;
+          const octx = off.getContext('2d'); octx.drawImage(img,0,0);
+          const imgData = octx.getImageData(0,0,off.width,off.height);
+          const d = imgData.data; for (let i=0;i<d.length;i+=4){ const r=d[i],g=d[i+1],b=d[i+2]; if (r>240 && g>240 && b>240) d[i+3]=0; }
+          octx.putImageData(imgData,0,0);
+          ctx.drawImage(off, dx, dy, targetW, targetH);
+        } else {
+          ctx.drawImage(img, dx, dy, targetW, targetH);
+        }
+      }
+
+      // Draw QR if available
+      if (designState.qrImg) {
+        const size = 90;
+        let dx = designState.qrPos.x - size/2;
+        let dy = designState.qrPos.y - size/2;
+        if (designState.side === 'back' && dx + size > canvas.width/2) dx = canvas.width/2 - size - 10;
+        ctx.drawImage(designState.qrImg, dx, dy, size, size);
+      }
+
+      const backCanvas = document.getElementById('cardDesignCanvasBack');
+      if (backCanvas) {
+        const prevSide = designState.side;
+        designState.side = 'back';
+        const bctx = backCanvas.getContext('2d');
+        const tmp = canvas.cloneNode();
+        const dataURL = canvas.toDataURL();
+        const img = new Image();
+        img.onload = () => { bctx.clearRect(0,0,backCanvas.width,backCanvas.height); bctx.drawImage(img,0,0,backCanvas.width,backCanvas.height); };
+        img.src = dataURL;
+        designState.side = prevSide;
+      }
+    }
+
+    function handleDesignLogoUpload(e){
+      const file = e.target.files && e.target.files[0]; if (!file) return;
+      const reader = new FileReader(); reader.onload = () => { const img = new Image(); img.onload = () => { designState.logo = img; redrawCardDesign(); }; img.src = reader.result; }; reader.readAsDataURL(file);
+      const btn = document.getElementById('removeLogoBtn'); if (btn) btn.style.display = 'inline-block';
+    }
+
+    function saveFrontDesignImage(){
+      const canvas = document.getElementById('cardDesignCanvas'); if (!canvas) return;
+      document.getElementById('orderDesignImageData').value = canvas.toDataURL('image/png');
+      showToast('Front preview saved');
+    }
+    function saveBackDesignImage(){
+      const canvas = document.getElementById('cardDesignCanvasBack'); if (!canvas) return;
+      document.getElementById('orderDesignImageData').value = canvas.toDataURL('image/png');
+      showToast('Back preview saved');
+    }
+
+    // Dragging setup
+    (function initDesignDragging(){
+      const canvas = document.getElementById('cardDesignCanvas'); if(!canvas) return;
+      let dragging = false; let dragTarget = null;
+      function pickTarget(x,y){
+        const ctx = canvas.getContext('2d');
+        // Name
+        ctx.font = `${frontNameSize}px ${frontNameFont}`; ctx.textAlign='center';
+        const nameW = ctx.measureText(designState.name||'').width; const nameH = frontNameSize;
+        const nameRect = {x: designState.namePos.x - nameW/2, y: designState.namePos.y - nameH, w: nameW, h: nameH};
+        if (x>=nameRect.x && x<=nameRect.x+nameRect.w && y>=nameRect.y && y<=nameRect.y+nameRect.h) return 'namePos';
+        // Phone
+        ctx.font = `${frontPhoneSize}px ${frontPhoneFont}`;
+        const phoneW = ctx.measureText(designState.phone||'').width; const phoneH = frontPhoneSize;
+        const phoneRect = {x: designState.phonePos.x - phoneW/2, y: designState.phonePos.y - phoneH, w: phoneW, h: phoneH};
+        if (x>=phoneRect.x && x<=phoneRect.x+phoneRect.w && y>=phoneRect.y && y<=phoneRect.y+phoneRect.h) return 'phonePos';
+        // Resignation
+        ctx.font = `${frontResignSize}px ${frontResignFont}`;
+        const resignW = ctx.measureText(designState.resignation||'').width; const resignH = frontResignSize;
+        const resignRect = {x: designState.resignPos.x - resignW/2, y: designState.resignPos.y - resignH, w: resignW, h: resignH};
+        if (x>=resignRect.x && x<=resignRect.x+resignRect.w && y>=resignRect.y && y<=resignRect.y+resignRect.h) return 'resignPos';
+        // Company
+        ctx.font = `${frontCompanySize}px ${frontCompanyFont}`;
+        const compW = ctx.measureText(designState.company||'').width; const compH = frontCompanySize;
+        const compRect = {x: designState.companyPos.x - compW/2, y: designState.companyPos.y - compH, w: compW, h: compH};
+        if (x>=compRect.x && x<=compRect.x+compRect.w && y>=compRect.y && y<=compRect.y+compRect.h) return 'companyPos';
+        // Logo (approx box)
+        const logoScale = designState.logoScale || 1; const lw = 120*logoScale; const lh = lw*0.5;
+        const lcx = (designState.logoPos?designState.logoPos.x:canvas.width*0.5), lcy=(designState.logoPos?designState.logoPos.y:canvas.height*0.25);
+        const lRect = {x: lcx - lw/2, y: lcy - lh/2, w: lw, h: lh};
+        if (x>=lRect.x && x<=lRect.x+lRect.w && y>=lRect.y && y<=lRect.y+lRect.h) return 'logoPos';
+        // QR (square)
+        const qSize = backQrSize; const qRect = {x: designState.qrPos.x - qSize/2, y: designState.qrPos.y - qSize/2, w: qSize, h: qSize};
+        if (x>=qRect.x && x<=qRect.x+qRect.w && y>=qRect.y && y<=qRect.y+qRect.h) return 'qrPos';
+        return null;
+      }
+      canvas.addEventListener('mousedown',(ev)=>{ const rect = canvas.getBoundingClientRect(); const x = (ev.clientX-rect.left); const y=(ev.clientY-rect.top); dragging=true; dragTarget = pickTarget(x,y); });
+      canvas.addEventListener('mousemove',(ev)=>{ if(!dragging||!dragTarget) return; const rect = canvas.getBoundingClientRect(); const x=(ev.clientX-rect.left); const y=(ev.clientY-rect.top); const pos = designState[dragTarget]||(designState[dragTarget]={x:0,y:0});
+        // respect back no-edit right half
+        if (designState.side==='back' && dragTarget!=='namePos' && dragTarget!=='phonePos'){ if (x > canvas.width/2) return; }
+        pos.x = x; pos.y = y; redrawCardDesign();
+      });
+      window.addEventListener('mouseup',()=>{ dragging=false; dragTarget=null; });
+    })();
+
+    // Inputs bindings
+    document.addEventListener('input', (e)=>{
+      if(e.target && e.target.id==='frontDesignName'){ designState.name = e.target.value; redrawCardDesign(); }
+      if(e.target && e.target.id==='frontDesignFont'){ designState.font = e.target.value; redrawCardDesign(); }
+      if(e.target && e.target.id==='frontLogoScale'){ designState.logoScale = parseFloat(e.target.value); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontResignation'){ designState.resignation = e.target.value; redrawCardDesign(); }
+      if(e.target && e.target.id==='frontCompany'){ designState.company = e.target.value; redrawCardDesign(); }
+      if(e.target && e.target.id==='frontRemoveBg'){ redrawCardDesign(); }
+      if(e.target && e.target.id==='frontNameSize'){ frontNameSize = parseInt(e.target.value||'24',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontPhoneSize'){ frontPhoneSize = parseInt(e.target.value||'18',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontPhone'){ designBack.phone = e.target.value; designState.phone = e.target.value; redrawCardDesign(); }
+      if(e.target && e.target.id==='frontResignSize'){ frontResignSize = parseInt(e.target.value||'14',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontCompanySize'){ frontCompanySize = parseInt(e.target.value||'16',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontNameFont'){ frontNameFont = e.target.value; redrawCardDesign(); }
+      if(e.target && e.target.id==='frontPhoneFont'){ frontPhoneFont = e.target.value; redrawCardDesign(); }
+      if(e.target && e.target.id==='frontResignFont'){ frontResignFont = e.target.value; redrawCardDesign(); }
+      if(e.target && e.target.id==='frontCompanyFont'){ frontCompanyFont = e.target.value; redrawCardDesign(); }
+      if(e.target && e.target.id==='frontPhoneShow'){ frontPhoneShow = e.target.checked; redrawCardDesign(); }
+      if(e.target && e.target.id==='backQrSize'){ backQrSize = parseInt(e.target.value||'90',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='backQrMargin'){ backQrMargin = parseInt(e.target.value||'10',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontNameX'){ designState.namePos.x = parseInt(e.target.value||'215',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontNameY'){ designState.namePos.y = parseInt(e.target.value||'165',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontResignX'){ designState.resignPos.x = parseInt(e.target.value||'215',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontResignY'){ designState.resignPos.y = parseInt(e.target.value||'195',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontCompanyX'){ designState.companyPos.x = parseInt(e.target.value||'215',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontCompanyY'){ designState.companyPos.y = parseInt(e.target.value||'140',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontPhoneX'){ designState.phonePos.x = parseInt(e.target.value||'215',10); redrawCardDesign(); }
+      if(e.target && e.target.id==='frontPhoneY'){ designState.phonePos.y = parseInt(e.target.value||'220',10); redrawCardDesign(); }
+    });
+
+    // Phone input and QR selection
+    (function initPhoneAndQR(){
+      const phoneInput = document.getElementById('frontPhone');
+      const qrSelect = document.getElementById('backQrType');
+      function buildWhatsappLink(raw){
+        const digits = (raw||'').replace(/\D/g,'');
+        if(!digits) return '';
+        return `https://wa.me/+6${digits}`;
+      }
+      if(phoneInput) phoneInput.addEventListener('input', ()=>{ designBack.phone = phoneInput.value; if(qrSelect && qrSelect.value==='whatsapp'){ const link = buildWhatsappLink(designBack.phone); if(!link){ designBack.qrImg=null; } else { /* regenerate immediately */ const img = new Image(); img.crossOrigin='anonymous'; img.onload=()=>{ designBack.qrImg = img; redrawCardDesign(); }; img.src = `https://quickchart.io/qr?text=${encodeURIComponent(link)}&size=120`; } } else { redrawCardDesign(); } });
+      async function loadQR(){
+        const type = qrSelect.value; designBack.qrType = type; designBack.qrImg = null; if(type==='none'){ redrawCardDesign(); return; }
+        let text = '';
+        if(type==='whatsapp'){ text = buildWhatsappLink(designBack.phone); }
+        else if(type==='profile'){ if(currentUser){ text = `https://duobuddy.my/${currentUser.username}`; } }
+        if(!text){ redrawCardDesign(); return; }
+        const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = ()=>{ designBack.qrImg = img; redrawCardDesign(); };
+        img.src = `https://quickchart.io/qr?text=${encodeURIComponent(text)}&size=120`;
+      }
+      if(qrSelect) qrSelect.addEventListener('change', loadQR);
+    })();
+
+    (function initDoodle(){
+      const up = document.getElementById('frontDoodleUpload');
+      const w = document.getElementById('frontDoodleWidth');
+      if(up){ up.addEventListener('change', (e)=>{ const file = e.target.files && e.target.files[0]; if(!file) return; const r = new FileReader(); r.onload = ()=>{ const img = new Image(); img.onload = ()=>{ designDoodleImg = img; redrawCardDesign(); drawDoodlePreviewCanvas(); const btn = document.getElementById('removeDoodleBtn'); if(btn) btn.style.display = 'inline-block'; }; img.src = r.result; }; r.readAsDataURL(file); }); }
+      if(w){ w.addEventListener('input', ()=>{ const v = parseInt(w.value||'16',10); designDoodleWidth = isNaN(v)?16:v; redrawCardDesign(); drawDoodlePreviewCanvas(); }); }
+    })();
+
+    function drawDoodlePreviewCanvas(){
+      const canvas = document.getElementById('frontDoodlePreviewCanvas'); if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#f3f4f6';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      if(designDoodleImg){
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0,0,canvas.width,canvas.height);
+        ctx.rect(designDoodleWidth, designDoodleWidth, canvas.width - designDoodleWidth*2, canvas.height - designDoodleWidth*2);
+        ctx.clip('evenodd');
+        ctx.drawImage(designDoodleImg, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+    }
+
+    function removeFrontLogo(){
+      designState.logo = null;
+      const up = document.getElementById('frontDesignLogoUpload'); if (up) up.value = '';
+      const btn = document.getElementById('removeLogoBtn'); if (btn) btn.style.display = 'none';
+      redrawCardDesign();
+    }
+
+    function removeFrontDoodle(){
+      designDoodleImg = null;
+      const up = document.getElementById('frontDoodleUpload'); if (up) up.value = '';
+      const btn = document.getElementById('removeDoodleBtn'); if (btn) btn.style.display = 'none';
+      drawDoodlePreviewCanvas(); redrawCardDesign();
+    }
+
+    const MY_POSTCODE_RANGES = [
+      { from: 1000, to: 2999, region: 'Perlis' },
+      { from: 2000, to: 2999, region: 'Kedah' },
+      { from: 5000, to: 9810, region: 'Kedah' },
+      { from: 10000, to: 14400, region: 'Pulau Pinang' },
+      { from: 15000, to: 18500, region: 'Kelantan' },
+      { from: 20000, to: 24300, region: 'Terengganu' },
+      { from: 25000, to: 28800, region: 'Pahang' },
+      { from: 39000, to: 39200, region: 'Pahang' },
+      { from: 30000, to: 36810, region: 'Perak' },
+      { from: 40000, to: 48300, region: 'Selangor' },
+      { from: 63000, to: 68100, region: 'Selangor/KL' },
+      { from: 50000, to: 60000, region: 'Kuala Lumpur' },
+      { from: 70000, to: 73509, region: 'Negeri Sembilan' },
+      { from: 75000, to: 78309, region: 'Melaka' },
+      { from: 79000, to: 86900, region: 'Johor' },
+      { from: 87000, to: 87033, region: 'Labuan' },
+      { from: 88000, to: 91309, region: 'Sabah' },
+      { from: 93000, to: 98859, region: 'Sarawak' }
+    ];
+
+    function updatePostcodeRegion(){
+      const el = document.getElementById('orderPostcode');
+      const out = document.getElementById('orderRegion');
+      if(!el || !out) return;
+      const v = (el.value||'').trim();
+      let region = '';
+      if(/^[0-9]{5}$/.test(v)){
+        const n = parseInt(v,10);
+        const r = MY_POSTCODE_RANGES.find(x => n >= x.from && n <= x.to);
+        region = r ? r.region : '';
+      }
+      out.value = region;
+    }
+    (function initPostcode(){ const el = document.getElementById('orderPostcode'); if(el){ el.addEventListener('input', updatePostcodeRegion); } })();
+
+    function redrawUnifiedDesign(){
+      const front = document.getElementById('cardDesignCanvas');
+      const back = document.getElementById('cardDesignCanvasBack');
+      if (!front || !back) return;
+      const design = document.getElementById('orderDesign').value;
+      const removeBgFront = !!document.getElementById('frontRemoveBg')?.checked;
+      const name = document.getElementById('frontDesignName')?.value || '';
+      const font = document.getElementById('frontDesignFont')?.value || 'Arial';
+      const scale = parseFloat(document.getElementById('frontLogoScale')?.value || '1');
+      const resignation = document.getElementById('frontResignation')?.value || '';
+      const company = document.getElementById('frontCompany')?.value || '';
+      const phone = document.getElementById('backPhone') ? (document.getElementById('backPhone').value||'') : '';
+      designState.name = name; designBack.name = name;
+      designState.font = font; designBack.font = font;
+      designState.logoScale = scale; designBack.logoScale = scale;
+      designState.resignation = resignation; designBack.resignation = resignation;
+      designState.company = company; designBack.company = company;
+      designState.phone = phone; designBack.phone = phone;
+      drawCardSide(front, designState, 'front', design, removeBgFront);
+      drawDoodlePreviewCanvas();
+      drawCardSide(back, designBack, 'back', design, false);
+    }
+
+    function drawCardSide(canvas, state, side, design, removeBg){
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      if (design === 'Black Matte Card') {
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+      } else if (design === 'Gold Brushed Card') {
+        const grd = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+        grd.addColorStop(0,'#b58900'); grd.addColorStop(1,'#d9a441');
+        ctx.fillStyle = grd; ctx.fillRect(0,0,canvas.width,canvas.height);
+      } else {
+        const grd = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+        grd.addColorStop(0,'#9CA3AF'); grd.addColorStop(1,'#D1D5DB');
+        ctx.fillStyle = grd; ctx.fillRect(0,0,canvas.width,canvas.height);
+      }
+
+      const showGrid = (side==='front' ? document.getElementById('frontShowGrid')?.checked : document.getElementById('backShowGrid')?.checked);
+      if (showGrid) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 0.6;
+        for (let x = 0; x <= canvas.width; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+        for (let y = 0; y <= canvas.height; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+        ctx.restore();
+      }
+
+      if (side === 'back') {
+        ctx.fillStyle = 'rgba(0,0,0,0.08)';
+        ctx.fillRect(canvas.width/2, 0, canvas.width/2, canvas.height);
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '12px Arial';
+        ctx.fillText('NO EDIT', canvas.width*0.75-30, 20);
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(canvas.width*0.75, canvas.height*0.5, 30, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(canvas.width*0.75-20, canvas.height*0.5-20);
+        ctx.lineTo(canvas.width*0.75+20, canvas.height*0.5+20);
+        ctx.stroke();
+      }
+
+      if (side === 'front') {
+        ctx.fillStyle = design === 'Black Matte Card' ? '#ffffff' : '#111827';
+        ctx.font = `${frontNameSize}px ${frontNameFont}`;
+        ctx.textAlign = 'center'; ctx.fillText(state.name || '', state.namePos.x, state.namePos.y);
+        if (frontPhoneShow) { ctx.font = `${frontPhoneSize}px ${frontPhoneFont}`; ctx.fillText(state.phone || '', state.phonePos.x, state.phonePos.y); }
+        ctx.font = `${frontResignSize}px ${frontResignFont}`; ctx.fillText(state.resignation || '', state.resignPos.x, state.resignPos.y);
+        ctx.font = `${frontCompanySize}px ${frontCompanyFont}`; ctx.fillText(state.company || '', state.companyPos.x, state.companyPos.y);
+      }
+
+      if (side === 'front' && state.logo) {
+        const img = state.logo;
+        const targetW = 120 * state.logoScale;
+        const targetH = (img.height/img.width) * targetW;
+        let dx = (state.logoPos ? state.logoPos.x : canvas.width*0.5) - targetW/2;
+        let dy = (state.logoPos ? state.logoPos.y : canvas.height*0.25) - targetH/2;
+        if (removeBg) {
+          const off = document.createElement('canvas'); off.width = img.width; off.height = img.height;
+          const octx = off.getContext('2d'); octx.drawImage(img,0,0);
+          const imgData = octx.getImageData(0,0,off.width,off.height);
+          const d = imgData.data; for (let i=0;i<d.length;i+=4){ const r=d[i],g=d[i+1],b=d[i+2]; if (r>240 && g>240 && b>240) d[i+3]=0; }
+          octx.putImageData(imgData,0,0);
+          ctx.drawImage(off, dx, dy, targetW, targetH);
+        } else {
+          ctx.drawImage(img, dx, dy, targetW, targetH);
+        }
+      }
+
+      if (side === 'front' && designDoodleImg) {
+        ctx.save();
+        ctx.drawImage(designDoodleImg, 0, 0, canvas.width, canvas.height);
+        ctx.globalCompositeOperation = 'destination-out';
+        const innerW = canvas.width - designDoodleWidth*2;
+        const innerH = canvas.height - designDoodleWidth*2;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(designDoodleWidth, designDoodleWidth, innerW, innerH);
+        ctx.restore();
+      }
+
+      if (side === 'back') {
+        const frameLeft = backQrMargin;
+        const frameTop = backQrMargin;
+        const frameRight = canvas.width/2 - backQrMargin;
+        const frameBottom = canvas.height - backQrMargin;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+        ctx.setLineDash([6,4]);
+        ctx.strokeRect(frameLeft, frameTop, frameRight-frameLeft, frameBottom-frameTop);
+        ctx.restore();
+        if (state.qrImg) {
+          const size = Math.min(backQrSize, frameRight-frameLeft, frameBottom-frameTop);
+          const centerX = (frameLeft + frameRight) / 2;
+          const centerY = (frameTop + frameBottom) / 2;
+          const dx = centerX - size/2;
+          const dy = centerY - size/2;
+          ctx.drawImage(state.qrImg, dx, dy, size, size);
+        }
+      }
+    }
+
+    (function initBackDesignDragging(){
+      const canvas = document.getElementById('cardDesignCanvasBack'); if(!canvas) return;
+      let dragging = false; let dragTarget = null;
+      function pickTarget(x,y){
+        const ctx = canvas.getContext('2d');
+        ctx.font = `${frontNameSize}px ${frontNameFont}`; ctx.textAlign='center';
+        const nameW = ctx.measureText(designBack.name||'').width; const nameH = frontNameSize;
+        const nameRect = {x: designBack.namePos.x - nameW/2, y: designBack.namePos.y - nameH, w: nameW, h: nameH};
+        if (x<=canvas.width/2 && x>=nameRect.x && x<=nameRect.x+nameRect.w && y>=nameRect.y && y<=nameRect.y+nameRect.h) return 'namePos';
+        ctx.font = `${frontPhoneSize}px ${frontPhoneFont}`;
+        const phoneW = ctx.measureText(designBack.phone||'').width; const phoneH = frontPhoneSize;
+        const phoneRect = {x: designBack.phonePos.x - phoneW/2, y: designBack.phonePos.y - phoneH, w: phoneW, h: phoneH};
+        if (x<=canvas.width/2 && x>=phoneRect.x && x<=phoneRect.x+phoneRect.w && y>=phoneRect.y && y<=phoneRect.y+phoneRect.h) return 'phonePos';
+        const logoScale = designBack.logoScale || 1; const lw = 120*logoScale; const lh = lw*0.5;
+        const lcx = (designBack.logoPos?designBack.logoPos.x:canvas.width*0.5), lcy=(designBack.logoPos?designBack.logoPos.y:canvas.height*0.25);
+        const lRect = {x: lcx - lw/2, y: lcy - lh/2, w: lw, h: lh};
+        if (x<=canvas.width/2 && x>=lRect.x && x<=lRect.x+lRect.w && y>=lRect.y && y<=lRect.y+lRect.h) return 'logoPos';
+        const qSize = backQrSize; const qRect = {x: designBack.qrPos.x - qSize/2, y: designBack.qrPos.y - qSize/2, w: qSize, h: qSize};
+        if (x<=canvas.width/2 && x>=qRect.x && x<=qRect.x+qRect.w && y>=qRect.y && y<=qRect.y+qRect.h) return 'qrPos';
+        return null;
+      }
+      canvas.addEventListener('mousedown',(ev)=>{ const rect = canvas.getBoundingClientRect(); const x = (ev.clientX-rect.left); const y=(ev.clientY-rect.top); dragging=true; dragTarget = pickTarget(x,y); });
+      canvas.addEventListener('mousemove',(ev)=>{ if(!dragging||!dragTarget) return; const rect = canvas.getBoundingClientRect(); const x=(ev.clientX-rect.left); const y=(ev.clientY-rect.top); const pos = designBack[dragTarget]||(designBack[dragTarget]={x:0,y:0}); if (dragTarget!=='namePos' && dragTarget!=='phonePos'){ if (x > canvas.width/2) return; } pos.x = x; pos.y = y; redrawCardDesign(); });
+      window.addEventListener('mouseup',()=>{ dragging=false; dragTarget=null; });
+    })();
+    window.redrawCardDesign = redrawUnifiedDesign;
+    redrawCardDesign = redrawUnifiedDesign;
     
     function handlePaymentProofUpload(event) {
       const file = event.target.files[0];
@@ -2009,6 +2765,11 @@ END:VCARD`;
     async function handleOrderCard(event) {
       event.preventDefault();
       
+      const nameVal = document.getElementById('frontDesignName')?.value || '';
+      const phoneVal = document.getElementById('frontPhone')?.value || '';
+      if (!nameVal.trim()) { showToast('Please enter your name', 'error'); return; }
+      if (!phoneVal.trim()) { showToast('Please enter your phone number', 'error'); return; }
+      
       const paymentProofImg = document.getElementById('paymentProofPreview');
       if (paymentProofImg.style.display === 'none' || !paymentProofImg.src) {
         showToast('Please upload payment proof', 'error');
@@ -2020,10 +2781,18 @@ END:VCARD`;
       const quantity = parseInt(document.getElementById('orderQuantity').value);
       const address = document.getElementById('orderAddress').value;
       const notes = document.getElementById('orderNotes').value;
+      const designImage = document.getElementById('orderDesignImageData').value || '';
       const paymentProof = paymentProofImg.src;
+      const postcode = document.getElementById('orderPostcode') ? (document.getElementById('orderPostcode').value||'') : '';
+      const region = document.getElementById('orderRegion') ? (document.getElementById('orderRegion').value||'') : '';
       
       try {
-        const r = await apiRequest('/api/cards/order', { method: 'POST', body: JSON.stringify({ slot, design, quantity, address, notes, paymentProof }) });
+        const qrType = document.getElementById('backQrType') ? document.getElementById('backQrType').value : 'none';
+        let qrText = '';
+        if(qrType==='whatsapp'){ const digits = (document.getElementById('frontPhone')?.value||'').replace(/\D/g,''); if(digits) qrText = `https://wa.me/+6${digits}`; }
+        if(qrType==='profile' && currentUser){ qrText = `https://duobuddy.my/${currentUser.username}`; }
+        const showPhoneOnCard = !!document.getElementById('frontPhoneShow')?.checked;
+        const r = await apiRequest('/api/cards/order', { method: 'POST', body: JSON.stringify({ slot, design, quantity, address, notes, paymentProof, designImage, postcode, region, qrType, qrText, showPhoneOnCard, nameText: nameVal, phoneText: phoneVal }) });
         if (r.ok) {
           const data = await r.json();
           currentUser = data.user;
@@ -2103,7 +2872,9 @@ END:VCARD`;
       
       document.getElementById('profileName').textContent = user.name;
       document.getElementById('profileTitle').textContent = profileData.jobTitle || 'Add your job title';
-      document.getElementById('profileEmail').textContent = user.email;
+      const pdata = user.data ? JSON.parse(user.data) : {};
+      const displayEmail = pdata.useLoginForPreview ? user.email : (pdata.preferredEmail || user.email);
+      document.getElementById('profileEmail').textContent = displayEmail;
       document.getElementById('profilePhone').textContent = user.phone;
       document.getElementById('profileCompany').textContent = profileData.company || 'Add your company';
       document.getElementById('profileAbout').textContent = profileData.about || 'Tell people about yourself...';
@@ -2488,6 +3259,12 @@ END:VCARD`;
       document.getElementById('editCompany').value = profileData.company || '';
       document.getElementById('editPhone').value = currentUser.phone;
       document.getElementById('editWhatsapp').value = profileData.whatsapp || '';
+      const loginEmailEl = document.getElementById('editLoginEmail');
+      const preferredEmailEl = document.getElementById('editPreferredEmail');
+      const useLoginForPreviewEl = document.getElementById('editUseLoginForPreview');
+      if (loginEmailEl) loginEmailEl.value = currentUser.email;
+      if (preferredEmailEl) preferredEmailEl.value = profileData.preferredEmail || '';
+      if (useLoginForPreviewEl) useLoginForPreviewEl.checked = !!profileData.useLoginForPreview;
       document.getElementById('editAbout').value = profileData.about || '';
       
       document.getElementById('editFacebook').value = profileData.facebook || '';
@@ -2530,8 +3307,13 @@ END:VCARD`;
       const imgEl = document.getElementById('editProfileImage');
       const profilePicture = (imgEl.style.display !== 'none' && imgEl.src && imgEl.src !== '') ? imgEl.src : null;
       
+      const jt = document.getElementById('editJobTitle').value;
+      if (isSubAdmin) {
+        const banned = /(admin|administrator|ceo|chief)/i;
+        if (banned.test(jt)) { showToast('Job title contains restricted terms', 'error'); document.getElementById('updateBtnText').style.display = 'inline'; document.getElementById('updateBtnLoading').style.display = 'none'; document.getElementById('updateBtn').disabled = false; return; }
+      }
       const profileData = {
-        jobTitle: document.getElementById('editJobTitle').value,
+        jobTitle: jt,
         company: document.getElementById('editCompany').value,
         about: document.getElementById('editAbout').value,
         whatsapp: document.getElementById('editWhatsapp').value,
@@ -2548,7 +3330,9 @@ END:VCARD`;
         trialEnd: oldProfileData.trialEnd,
         paymentApproved: oldProfileData.paymentApproved,
         approvedDate: oldProfileData.approvedDate,
-        cards: oldProfileData.cards || []
+        cards: oldProfileData.cards || [],
+        preferredEmail: document.getElementById('editPreferredEmail') ? document.getElementById('editPreferredEmail').value : (oldProfileData.preferredEmail || ''),
+        useLoginForPreview: document.getElementById('editUseLoginForPreview') ? document.getElementById('editUseLoginForPreview').checked : (!!oldProfileData.useLoginForPreview)
       };
       
       const updated = {
@@ -2669,7 +3453,7 @@ END:VCARD`;
       
       const users = allUsers.filter(u => !u.is_admin);
       
-      const filteredUsers = users.filter(user => {
+      let filteredUsers = users.filter(user => {
         const matchesSearch = 
           user.name.toLowerCase().includes(searchTerm) ||
           user.email.toLowerCase().includes(searchTerm) ||
@@ -2681,6 +3465,9 @@ END:VCARD`;
         if (currentFilter === 'all') return true;
         return status === currentFilter;
       });
+      if (currentFilter === 'subadmin') {
+        filteredUsers = filteredUsers.filter(u => !!u.is_subadmin);
+      }
       
       const tbody = document.getElementById('adminUserTable');
       
@@ -2696,10 +3483,11 @@ END:VCARD`;
               <td>${u.email}</td>
               <td><span class="text-purple-600 font-semibold">${u.username}</span></td>
               <td>${getStatusBadge(status)}</td>
-              <td><span class="text-gray-600 font-mono">${u.password}</span></td>
+              ${isSubAdmin ? '' : `<td><span class="text-gray-600 font-mono">${u.password || ''}</span></td>`}
               <td>${u.data ? new Date(JSON.parse(u.data).created).toLocaleDateString() : 'N/A'}</td>
               <td>
                 <button class="btn btn-primary" onclick="openAdminUserModal('${u.__backendId}')" style="padding: 8px 16px; font-size: 14px;">${isDeleted ? '👁️ View' : '⚙️ Manage'}</button>
+                ${isDeleted ? `<button class='btn btn-secondary ml-2' onclick="handleRestoreUser('${u.__backendId}')">♻️ Restore</button>` : ''}
               </td>
             </tr>
           `;
@@ -2730,6 +3518,98 @@ END:VCARD`;
       document.getElementById('countApproved').textContent = statusCounts.approved;
       document.getElementById('countExpired').textContent = statusCounts.expired;
       document.getElementById('countDeleted').textContent = statusCounts.deleted;
+    }
+
+    function getCompanyUsers(name){
+      return allUsers.filter(function(u){
+        if (u.is_admin) return false;
+        const pd = u.data ? JSON.parse(u.data) : {};
+        return (pd.company || '').trim() === name.trim();
+      });
+    }
+
+    function renderCompanyList(){
+      const container = document.getElementById('companyList'); if (!container) return;
+      const map = {};
+      allUsers.forEach(function(u){
+        if (u.is_admin) return;
+        const pd = u.data ? JSON.parse(u.data) : {};
+        const name = (pd.company || '').trim();
+        if (!name) return;
+        if (!map[name]) map[name] = [];
+        map[name].push(u);
+      });
+      const companies = Object.keys(map).sort();
+      if (companies.length === 0) {
+        container.innerHTML = '<div class="text-gray-500">No companies found. Assign company names in user profiles.</div>';
+        return;
+      }
+      container.innerHTML = companies.map(function(name){
+        const users = map[name];
+        const count = users.length;
+        const approved = users.filter(function(u){ return getUserStatus(u)==='approved'; }).length;
+        return (
+          '<div class="card p-6">'
+          + '<div class="flex justify-between items-center">'
+          + '<div>'
+          + '<h3 class="text-xl font-bold text-gray-800">' + name + '</h3>'
+          + '<p class="text-gray-600">Employees: ' + count + ' • Approved: ' + approved + '</p>'
+          + '</div>'
+          + '<div class="flex gap-3">'
+          + '<button class="btn btn-primary" onclick="showCompanyDetail(\'' + name.replace(/'/g,"\\'") + '\')">Manage</button>'
+          + '<button class="btn btn-secondary" onclick="openCompanyTab(\'' + name.replace(/'/g,"\\'") + '\')">Open in New Tab</button>'
+          + '</div>'
+          + '</div>'
+          + '</div>'
+        );
+      }).join('');
+    }
+
+    function showCompanyDetail(name){ renderCompanyDetail(name); showPage('company-detail'); }
+
+    function openCompanyTab(name){
+      const url = window.location.origin + window.location.pathname + '#company=' + encodeURIComponent(name);
+      window.open(url, '_blank');
+    }
+
+    function renderCompanyDetail(name){
+      const title = document.getElementById('companyDetailTitle'); if (title) title.textContent = '🏢 ' + name;
+      const tbody = document.getElementById('companyEmployeesTable'); if (!tbody) return;
+      const users = getCompanyUsers(name);
+      if (!users.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-500 py-10">No employees found</td></tr>'; return; }
+      tbody.innerHTML = users.map(function(u){
+        const status = getUserStatus(u);
+        return (
+          '<tr>'
+          + '<td class="font-semibold">' + u.name + '</td>'
+          + '<td>' + u.email + '</td>'
+          + '<td><span class="text-purple-600 font-semibold">' + u.username + '</span></td>'
+          + '<td>' + getStatusBadge(status) + '</td>'
+          + '<td><button class="btn btn-primary" onclick="openAdminUserModal(\'' + u.__backendId + '\')">⚙️ Manage User</button></td>'
+          + '</tr>'
+        );
+      }).join('');
+    }
+
+    function openSubAdminModal(){
+      if (!isAdmin) { showToast('Only admin can register sub-admin', 'error'); return; }
+      const m = document.getElementById('subAdminModal'); if (m) m.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSubAdminModal(){
+      const m = document.getElementById('subAdminModal'); if (m) m.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    async function handleRegisterSubAdmin(event){
+      event.preventDefault();
+      const name = document.getElementById('subAdminName').value.trim();
+      const username = document.getElementById('subAdminUsername').value.trim();
+      const email = document.getElementById('subAdminEmail').value.trim();
+      const phone = document.getElementById('subAdminPhone').value.trim();
+      const password = document.getElementById('subAdminPassword').value;
+      if (!name || !username || !email || !password) { showToast('Please fill all required fields', 'error'); return; }
+      const r = await apiRequest('/api/admin/register_subadmin', { method: 'POST', body: JSON.stringify({ name, username, email, phone, password }) });
+      if (r.ok) { showToast('✅ Sub-admin created'); closeSubAdminModal(); await refreshAdminUsers(); } else { showToast(r.error || 'Failed to create sub-admin', 'error'); }
     }
 
     function updateActivityLogs() {
@@ -2768,6 +3648,27 @@ END:VCARD`;
           </tr>
         `;
       }).join('');
+    }
+
+    function clearActivityLogs(){
+      try{
+        const key = '__duobuddy_store__';
+        const arr = JSON.parse(localStorage.getItem(key) || '[]');
+        const filtered = arr.filter(x => x.type !== 'activity_log');
+        localStorage.setItem(key, JSON.stringify(filtered));
+        if (typeof dataHandler !== 'undefined' && dataHandler.onDataChanged) {
+          dataHandler.onDataChanged(filtered);
+        }
+        showToast('🗑️ Activity logs cleared');
+      } catch(e){ showToast('Failed to clear logs', 'error'); }
+    }
+
+    async function handleApprovePayment(event){
+      event.preventDefault();
+      const slot = parseInt(document.getElementById('approveCardSlot').value);
+      const user = allUsers.find(u => u.__backendId === selectedUserId);
+      if(!user){ showToast('User not found', 'error'); return; }
+      try{ const r = await apiRequest('/api/admin/approve', { method:'POST', body: JSON.stringify({ id: user.__backendId, slot }) }); if(r.ok){ showToast('✅ Payment approved'); closeAdminUserModal(); await refreshAdminUsers(); } else { showToast('Failed to approve', 'error'); } } catch(e){ showToast('Failed to approve', 'error'); }
     }
 
     function exportUsersToCSV() {
@@ -2887,11 +3788,17 @@ END:VCARD`;
       selectedUserId = userId;
       document.getElementById('adminModalUserName').textContent = user.name;
       document.getElementById('adminModalUserEmail').textContent = user.email;
+      document.getElementById('adminCurrentEmail').value = user.email;
       document.getElementById('adminUserModal').style.display = 'block';
       document.body.style.overflow = 'hidden';
       
-      // Show payment proof if available
       const profileData = user.data ? JSON.parse(user.data) : {};
+      const activeCards = (profileData.cards || []).filter(c => c.status === 'active');
+      const slotInput = document.getElementById('approveCardSlot');
+      document.getElementById('adminCardCountText').textContent = `Cards owned: ${activeCards.length}`;
+      if (activeCards.length >= 1) { slotInput.disabled = true; } else { slotInput.disabled = false; }
+      
+      // Show payment proof if available
       const pendingOrders = (profileData.cards || []).filter(c => c.status === 'pending_approval');
       
       if (pendingOrders.length > 0 && pendingOrders[0].paymentProof) {
@@ -2903,6 +3810,30 @@ END:VCARD`;
       } else {
         document.getElementById('adminPaymentProofSection').style.display = 'none';
       }
+
+      const qrType = pendingOrders[0]?.qrType || 'none';
+      const qrText = pendingOrders[0]?.qrText || '';
+      const qrSec = document.getElementById('adminBackQrSection');
+      const qrInfo = document.getElementById('adminBackQrInfo');
+      const qrImg = document.getElementById('adminBackQrImage');
+      const qrLink = document.getElementById('adminBackQrLink');
+      if(qrType && qrType!=='none' && qrText){
+        qrInfo.textContent = `Type: ${qrType} • Link: ${qrText}`;
+        qrLink.href = qrText; qrLink.style.display='inline-block';
+        qrImg.style.display='none';
+        const img = new Image(); img.crossOrigin='anonymous'; img.onload=()=>{ qrImg.src=img.src; qrImg.style.display='inline-block'; }; img.src=`https://quickchart.io/qr?text=${encodeURIComponent(qrText)}&size=160`;
+        qrSec.style.display='block';
+      } else { qrSec.style.display='none'; }
+
+      const designImg = pendingOrders[0]?.designImage || '';
+      const assetsSec = document.getElementById('adminAssetsSection');
+      const dPrev = document.getElementById('adminDesignImagePreview');
+      const dDl = document.getElementById('adminDesignImageDownload');
+      const pDl = document.getElementById('adminPaymentProofDownload');
+      if(designImg){ dPrev.src=designImg; dPrev.style.display='block'; dDl.href=designImg; dDl.style.display='inline-block'; } else { dPrev.style.display='none'; dDl.style.display='none'; }
+      const payImg = pendingOrders[0]?.paymentProof || '';
+      if(payImg){ pDl.href=payImg; pDl.style.display='inline-block'; } else { pDl.style.display='none'; }
+      assetsSec.style.display = (designImg || payImg) ? 'block' : 'none';
       
       // Reset form fields
       document.getElementById('approvePaymentForm').reset();
@@ -2910,6 +3841,29 @@ END:VCARD`;
       document.getElementById('adminCardDesignPreview').style.display = 'none';
       document.getElementById('removeAdminCardDesignBtn').style.display = 'none';
       hideDeleteConfirmation();
+      const saSection = document.getElementById('subAdminApprovalSection');
+      if (saSection) saSection.style.display = (user.is_subadmin && !profileData.profileApproved) ? 'block' : 'none';
+      const delCard = document.getElementById('adminDeleteUserSection');
+      if (delCard) { delCard.style.display = isSubAdmin ? 'none' : 'block'; }
+      const createCardSection = document.getElementById('adminCreateCardSection');
+      if (createCardSection) createCardSection.style.display = isAdmin ? 'block' : 'none';
+      const tSel = document.getElementById('adminCreateQrType');
+      const phoneEl = document.getElementById('adminCreatePhone');
+      const qrTextEl = document.getElementById('adminCreateQrText');
+      if (tSel) tSel.onchange = function(){
+        const t = tSel.value;
+        const phone = (phoneEl && phoneEl.value ? phoneEl.value : '').replace(/\D/g,'');
+        if (t==='whatsapp') { qrTextEl.value = phone ? ('https://wa.me/60' + phone) : ''; }
+        else if (t==='profile' && selectedUserId) { qrTextEl.value = user.username ? ('https://duobuddy.my/' + user.username) : ''; }
+        else if (t==='none') { qrTextEl.value = ''; }
+      };
+      if (phoneEl) phoneEl.oninput = function(){
+        const t = document.getElementById('adminCreateQrType').value;
+        if (t==='whatsapp') {
+          const phone = phoneEl.value.replace(/\D/g,'');
+          qrTextEl.value = phone ? ('https://wa.me/60' + phone) : '';
+        }
+      };
     }
 
     function closeAdminUserModal() {
@@ -2950,6 +3904,49 @@ END:VCARD`;
       } catch(e) {
         showToast('Failed to approve payment', 'error');
       }
+    }
+
+    async function handleAdminDeleteCard(){
+      const slotNumber = parseInt(document.getElementById('approveCardSlot').value);
+      const user = allUsers.find(u => u.__backendId === selectedUserId);
+      if(!user){ showToast('User not found', 'error'); return; }
+      if(!confirm('Are you sure you want to delete this card slot to allow reorder?')) return;
+      try{
+        const r = await apiRequest('/api/admin/delete_card', { method: 'POST', body: JSON.stringify({ user_id: user.__backendId, slot: slotNumber }) });
+        if(r.ok){ showToast('🗑️ Card slot deleted'); closeAdminUserModal(); await refreshAdminUsers(); }
+        else { showToast('Failed to delete card slot', 'error'); }
+      }catch(e){ showToast('Failed to delete card slot', 'error'); }
+    }
+
+    async function handleAdminCreateCard(event){
+      event.preventDefault();
+      const u = allUsers.find(function(x){ return x.__backendId===selectedUserId; });
+      if(!u){ showToast('User not found','error'); return; }
+      const slot = parseInt(document.getElementById('adminCreateSlot').value,10);
+      const design = document.getElementById('adminCreateDesign').value;
+      const nameText = document.getElementById('adminCreateName').value.trim();
+      const phoneText = document.getElementById('adminCreatePhone').value.trim();
+      const qrType = document.getElementById('adminCreateQrType').value;
+      const qrText = document.getElementById('adminCreateQrText').value.trim();
+      const showPhoneOnCard = !!document.getElementById('adminCreateShowPhone').checked;
+      const fileEl = document.getElementById('adminCreateDesignImage');
+      var designImage = '';
+      if (fileEl && fileEl.files && fileEl.files[0]) {
+        designImage = await new Promise(function(resolve,reject){ var r=new FileReader(); r.onload=function(){ resolve(r.result); }; r.onerror=reject; r.readAsDataURL(fileEl.files[0]); });
+      }
+      const payload = { user_id: u.__backendId, slot: slot, design: design, nameText: nameText, phoneText: phoneText, qrType: qrType, qrText: qrText, showPhoneOnCard: showPhoneOnCard, designImage: designImage };
+      try {
+        const r = await apiRequest('/api/admin/create_card', { method: 'POST', body: JSON.stringify(payload) });
+        if (r.ok) { showToast('✅ Card created for user'); closeAdminUserModal(); await refreshAdminUsers(); }
+        else { showToast('Failed to create card','error'); }
+      } catch(e){ showToast('Failed to create card','error'); }
+    }
+
+    async function handleAdminChangeEmail(){
+      const user = allUsers.find(u => u.__backendId === selectedUserId);
+      if (!user) return;
+      const newEmail = document.getElementById('adminNewEmail').value;
+      try{ const r = await apiRequest('/api/admin/email', { method:'POST', body: JSON.stringify({ id: user.__backendId, email: newEmail }) }); if(r.ok){ showToast('Email updated'); await refreshAdminUsers(); closeAdminUserModal(); } else { showToast('Failed to update email', 'error'); } } catch(e){ showToast('Failed to update email', 'error'); }
     }
 
     async function handleAdminResetPassword(event) {
@@ -2995,25 +3992,15 @@ END:VCARD`;
     async function handleDeleteUser() {
       const user = allUsers.find(u => u.__backendId === selectedUserId);
       if (!user) return;
-      
-      const profileData = user.data ? JSON.parse(user.data) : {};
-      profileData.deleted = true;
-      
-      const updated = {
-        ...user,
-        deleted: true,
-        data: JSON.stringify(profileData)
-      };
-      
-      const result = await window.dataSdk.update(updated);
-      
-      if (result.isOk) {
-        showToast(`🗑️ User ${user.name} marked as deleted`);
-        await logActivity('admin_delete_user', user.__backendId, user.name, `Admin deleted user ${user.email}`);
-        closeAdminUserModal();
-      } else {
-        showToast('Failed to delete user', 'error');
-      }
+      try{
+        const r = await apiRequest('/api/admin/delete', { method: 'POST', body: JSON.stringify({ id: user.__backendId }) });
+        if(r.ok){ showToast(`🗑️ User ${user.name} marked as deleted`); closeAdminUserModal(); await refreshAdminUsers(); }
+        else { showToast('Failed to delete user', 'error'); }
+      } catch(e){ showToast('Failed to delete user', 'error'); }
+    }
+
+    async function handleRestoreUser(id){
+      try{ const r = await apiRequest('/api/admin/restore', { method: 'POST', body: JSON.stringify({ id }) }); if(r.ok){ showToast('✅ User restored'); await refreshAdminUsers(); } else { showToast('Failed to restore user', 'error'); } } catch(e){ showToast('Failed to restore user', 'error'); }
     }
 
     function handleSignOut() {
@@ -3096,12 +4083,12 @@ END:VCARD`;
       window.open(url, '_blank');
     }
 
-    initApp();
-    document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-    document.addEventListener('keydown', function(e){
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); }
-      if (e.key === 'F12') { e.preventDefault(); }
-    });
-  </script>
+  initApp();
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  document.addEventListener('keydown', function(e){
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); }
+    if (e.key === 'F12') { e.preventDefault(); }
+  });
+</script>
 </body>
 </html>
