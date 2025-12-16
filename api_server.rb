@@ -3,12 +3,13 @@ require 'json'
 require 'securerandom'
 require 'openssl'
 
-PORT = 5050
-ALLOWED_ORIGINS = ['http://localhost:8000','http://127.0.0.1:8000']
+PORT = (ENV['PORT'] || '5050').to_i
+ALLOWED_ORIGINS = ['http://localhost:8000','http://127.0.0.1:8000','https://duobuddy.my','http://duobuddy.my']
 DATA_DIR = File.join(__dir__, 'data')
 USERS_FILE = File.join(DATA_DIR, 'users.json')
 
 SESSIONS = {}
+LOGIN_ATTEMPTS = {}
 
 def ensure_data
   Dir.mkdir(DATA_DIR) unless Dir.exist?(DATA_DIR)
@@ -90,17 +91,26 @@ server = WEBrick::HTTPServer.new(Port: PORT, AccessLog: [], Logger: WEBrick::Log
 server.mount_proc '/' do |req, res|
   if req.path == '/' || req.path.empty?
     res.status = 302
-    res['Location'] = '/DuoBuddy.html'
+    res['Location'] = '/index.html'
   else
-    # For any other static path, attempt to read and serve the file
-    path = File.join(Dir.pwd, req.path.sub(/^\//, ''))
-    if File.file?(path)
-      res['Content-Type'] = WEBrick::HTTPUtils.mime_type(path, WEBrick::HTTPUtils::DefaultMimeTypes)
-      res.body = File.binread(path)
+    spa_paths = %r{^/(login|signup|admin|company-management|my-cards|profile|edit-profile|change-password)$}
+    profile_path = %r{^/profile/[^/]+$}
+    company_path = %r{^/company/[^/]+$}
+    if req.path =~ spa_paths || req.path =~ profile_path || req.path =~ company_path
+      index = File.join(Dir.pwd, 'index.html')
+      res['Content-Type'] = 'text/html'
+      res.body = File.file?(index) ? File.binread(index) : '<!doctype html><html><body>Index not found</body></html>'
     else
-      res.status = 404
-      res['Content-Type'] = 'text/plain'
-      res.body = 'Not Found'
+      # For any other static path, attempt to read and serve the file
+      path = File.join(Dir.pwd, req.path.sub(/^\//, ''))
+      if File.file?(path)
+        res['Content-Type'] = WEBrick::HTTPUtils.mime_type(path, WEBrick::HTTPUtils::DefaultMimeTypes)
+        res.body = File.binread(path)
+      else
+        res.status = 404
+        res['Content-Type'] = 'text/plain'
+        res.body = 'Not Found'
+      end
     end
   end
 end
@@ -145,6 +155,20 @@ server.mount_proc '/api/auth/login' do |req, res|
     res.status = 204; next
   end
   set_json(res)
+  begin
+    ip = (req.respond_to?(:remote_ip) && req.remote_ip) || (req.peeraddr && req.peeraddr[3]) || 'unknown'
+    now = Time.now.to_i
+    st = LOGIN_ATTEMPTS[ip] || { count: 0, window: now }
+    if now - st[:window] > 300
+      st = { count: 0, window: now }
+    end
+    if st[:count] >= 10
+      res.status = 429; res.body = { error: 'too_many_attempts' }.to_json; next
+    end
+    st[:count] += 1
+    LOGIN_ATTEMPTS[ip] = st
+  rescue
+  end
   body = parse_body(req)
   email,password = body.values_at('email','password')
   users = read_users
@@ -158,7 +182,9 @@ server.mount_proc '/api/auth/login' do |req, res|
   end
   sid = SecureRandom.hex(16)
   SESSIONS[sid] = user['__backendId']
-  res['Set-Cookie'] = "sid=#{sid}; HttpOnly; Path=/; SameSite=Lax"
+  origin = req.header['origin']&.first
+  secure = origin && origin.start_with?('https://')
+  res['Set-Cookie'] = "sid=#{sid}; HttpOnly; Path=/; SameSite=Lax#{secure ? '; Secure' : ''}"
   res.body = { user: sanitize_user(user) }.to_json
 end
 
@@ -171,7 +197,41 @@ server.mount_proc '/api/auth/logout' do |req, res|
   sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
   sid = sid && sid[1]
   SESSIONS.delete(sid) if sid
-  res['Set-Cookie'] = "sid=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax"
+  origin = req.header['origin']&.first
+  secure = origin && origin.start_with?('https://')
+  res['Set-Cookie'] = "sid=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax#{secure ? '; Secure' : ''}"
+  res.body = { ok: true }.to_json
+end
+
+# Auth: change password
+server.mount_proc '/api/auth/change_password' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  users = read_users
+  uid = sid && SESSIONS[sid]
+  user = uid && users.find { |u| u['__backendId'] == uid }
+  unless user
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  current = body['currentPassword'].to_s
+  new_pwd = body['newPassword'].to_s
+  hp = hash_password(current, user['passwordSalt'])
+  if hp['hash'] != user['passwordHash']
+    res.status = 400; res.body = { error: 'invalid_current' }.to_json; next
+  end
+  unless valid_password?(new_pwd)
+    res.status = 400; res.body = { error: 'weak_password' }.to_json; next
+  end
+  nh = hash_password(new_pwd)
+  user['passwordSalt'] = nh['salt']
+  user['passwordHash'] = nh['hash']
+  write_users(users)
   res.body = { ok: true }.to_json
 end
 
@@ -249,8 +309,7 @@ server.mount_proc '/api/cards/order' do |req, res|
   res.body = { user: sanitize_user(user) }.to_json
 end
 
-trap('INT') { server.shutdown }
-server.start
+ 
 # Admin: list users (purge deleted > 7 days)
 server.mount_proc '/api/admin/users' do |req, res|
   set_cors(req, res)
@@ -514,6 +573,37 @@ server.mount_proc '/api/admin/email' do |req, res|
   write_users(users)
   res.body = { ok: true, user: sanitize_user(user) }.to_json
 end
+# Admin: reset user password
+server.mount_proc '/api/admin/reset_password' do |req, res|
+  set_cors(req, res)
+  if req.request_method == 'OPTIONS'
+    res.status = 204; next
+  end
+  set_json(res)
+  sid = (req.header['cookie'] || []).join.match(/sid=([^;]+)/)
+  sid = sid && sid[1]
+  uid = sid && SESSIONS[sid]
+  users = read_users
+  admin = users.find { |u| u['__backendId'] == uid }
+  unless admin && admin['is_admin']
+    res.status = 401; res.body = { error: 'unauthorized' }.to_json; next
+  end
+  body = parse_body(req)
+  id = body['id']
+  new_pwd = body['password'].to_s
+  unless valid_password?(new_pwd)
+    res.status = 400; res.body = { error: 'weak_password' }.to_json; next
+  end
+  user = users.find { |u| u['__backendId'] == id }
+  unless user
+    res.status = 404; res.body = { error: 'not_found' }.to_json; next
+  end
+  nh = hash_password(new_pwd)
+  user['passwordSalt'] = nh['salt']
+  user['passwordHash'] = nh['hash']
+  write_users(users)
+  res.body = { ok: true, user: sanitize_user(user) }.to_json
+end
 # Admin: register sub-admin
 server.mount_proc '/api/admin/register_subadmin' do |req, res|
   set_cors(req, res)
@@ -551,3 +641,5 @@ server.mount_proc '/api/admin/register_subadmin' do |req, res|
   write_users(users)
   res.body = { ok: true }.to_json
 end
+trap('INT') { server.shutdown }
+server.start
