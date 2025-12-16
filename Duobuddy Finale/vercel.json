@@ -1,0 +1,15 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/signup", "destination": "/index.html" },
+    { "source": "/admin", "destination": "/index.html" },
+    { "source": "/company-management", "destination": "/index.html" },
+    { "source": "/my-cards", "destination": "/index.html" },
+    { "source": "/profile", "destination": "/index.html" },
+    { "source": "/edit-profile", "destination": "/index.html" },
+    { "source": "/change-password", "destination": "/index.html" },
+    { "source": "/profile/:path*", "destination": "/index.html" },
+    { "source": "/company/:path*", "destination": "/index.html" }
+  ]
+}
